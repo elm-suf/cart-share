@@ -27,6 +27,7 @@ A mobile-first, login-free Progressive Web App (PWA) that allows users to instan
 15. As an Editor offline, I want my changes (adding, checking, reordering) to update the UI instantly and queue locally, so that I can continue shopping uninterrupted.
 16. As an Editor, I want my queued offline changes to sync to the server in chronological order when I reconnect, so that my partner's view is updated.
 17. As a Creator, I want to rotate/revoke the share link, so that if the link leaks, I can disable access to unauthorized users.
+18. As an Editor, I want to be notified when a new app update is deployed, so that I can click to reload it and ensure my client version remains compatible with the server.
 
 ## Implementation Decisions
 
@@ -35,15 +36,21 @@ A mobile-first, login-free Progressive Web App (PWA) that allows users to instan
     *   **Backend:** Node.js + Express.
     *   **Database:** SQLite on the server (using `better-sqlite3`) to store list state.
 *   **Real-time Sync & Conflicts:**
-    *   WebSocket protocol (using `ws` package) for instant, bi-directional sync.
-    *   Optimistic UI updates on the client side.
-    *   Conflict resolution via **Last-Write-Wins (LWW)** per field.
+    *   **HTTP Initial Load:** The client queries the API `GET /api/lists/:shareToken` to load the initial list state before opening the WebSocket.
+    *   **WebSocket Deltas:** Real-time updates (adds, checks, reorders) are synchronized via WebSocket messages containing incremental changes (deltas: `ITEM_ADDED`, `ITEM_UPDATED`, `ITEM_DELETED`, `LIST_RENAMED`) instead of full list broadcasts.
+    *   **Conflict Resolution:** SQLite writes are parameterized to update only modified columns. Each client sends its local modification timestamp (`updatedAt`), and writes are committed using a conditional check `WHERE id = ? AND ? >= updated_at`.
 *   **Item Ordering:**
     *   **Fractional Indexing** (floating-point positions) is used to store and sync item order.
     *   Moving an item only requires updating a single item's position to the midpoint of its new neighbors, preventing list-wide re-indexing conflicts.
 *   **Offline Support:**
     *   Full list state cached in browser `localStorage`.
     *   Offline changes are stored sequentially in a `syncQueue` array in `localStorage` and flushed chronologically upon reconnection.
+*   **Database Management (TTL):**
+    *   Lists maintain a `last_active_at` timestamp.
+    *   A background pruning task runs daily on the server to delete lists and items that have been inactive for more than 90 days.
+    *   If a client tries to open a pruned list, the server returns a `410 Gone` and the client removes it from its registry.
+*   **Version Updates:**
+    *   The PWA listens for new service worker scripts and prompts the user with a banner to reload. Clicking reload skips waiting, updates the service worker, and reloads the page.
 *   **Authentication & Security:**
     *   No logins, passwords, or emails.
     *   Share links use high-entropy random strings `/list/:shareToken`.
