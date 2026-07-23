@@ -32,7 +32,7 @@ A mobile-first, login-free Progressive Web App (PWA) that allows users to instan
 ## Implementation Decisions
 
 *   **Platform & Tech Stack:**
-    *   **Frontend:** Vite + React + TypeScript + Vanilla CSS, packaged as a Progressive Web App (PWA) with service workers for offline launch capabilities.
+    *   **Frontend:** Angular + TypeScript + Vanilla CSS, packaged as a Progressive Web App (PWA) with service workers for offline launch capabilities.
     *   **Backend:** Node.js + Express.
     *   **Database:** SQLite on the server (using `better-sqlite3`) to store list state.
 *   **Real-time Sync & Conflicts:**

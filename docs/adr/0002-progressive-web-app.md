@@ -1,6 +1,6 @@
 # Progressive Web App (PWA) for Mobile-First Delivery
 
-The MVP will be built as a Progressive Web App (PWA) using Vite, React, and TypeScript.
+The MVP will be built as a Progressive Web App (PWA) using Angular and TypeScript.
 
 ## Context & Motivation
 
@@ -10,7 +10,7 @@ Furthermore, a PWA allows the app to feel native (e.g., fullscreen mode, launche
 
 ## Decision
 
-We will build a single-page application using React, TypeScript, and Vite, styled with vanilla CSS. We will configure it as a PWA with a service worker to cache assets and allow the app to launch offline.
+We will build a single-page application using Angular and TypeScript, styled with vanilla CSS. We will configure it as a PWA with a service worker to cache assets and allow the app to launch offline.
 
 ## Consequences
 
