@@ -1,0 +1,257 @@
+/* =============================================
+   CartShare Global Design System
+   Dark-mode-first, mobile-first premium UI
+   ============================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --bg:             #08090c;
+  --panel-bg:       rgba(22, 25, 34, 0.70);
+  --border:         rgba(255, 255, 255, 0.08);
+  --text-primary:   #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted:     #4b5563;
+  --accent:         #10b981;
+  --accent-glow:    rgba(16, 185, 129, 0.22);
+  --accent-hover:   #059669;
+  --accent-grad:    linear-gradient(135deg, #10b981, #06b6d4);
+  --font:           'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --shadow-sm:      0 2px 8px rgba(0, 0, 0, 0.40);
+  --shadow-lg:      0 10px 30px rgba(0, 0, 0, 0.60);
+  --spring:         all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --smooth:         all 0.25s ease;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Mobile-frame container ─────────────────── */
+.app-container {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  background-color: #0b0c10;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Landing page layout ────────────────────── */
+.landing-page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2.5rem 1.75rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─── Ambient glow blobs ─────────────────────── */
+.glow-orb,
+.glow-orb-2 {
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(22px);
+  z-index: 0;
+}
+
+.glow-orb {
+  background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+  top: -60px;
+  right: -60px;
+}
+
+.glow-orb-2 {
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.14) 0%, transparent 70%);
+  bottom: -60px;
+  left: -60px;
+}
+
+/* ─── Brand header ───────────────────────────── */
+.brand-header {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.logo-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 18px;
+  background: var(--accent-grad);
+  box-shadow: 0 0 24px var(--accent-glow);
+  margin-bottom: 1.5rem;
+}
+
+.logo-icon {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: #fff;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.brand-name {
+  font-size: 2.4rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  background: linear-gradient(to right, #ffffff, #d1d5db);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.brand-tagline {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  max-width: 300px;
+  margin: 0 auto;
+  line-height: 1.4;
+}
+
+/* ─── Feature intro card ─────────────────────── */
+.intro-section {
+  position: relative;
+  z-index: 1;
+  margin: 2.5rem 0;
+}
+
+.glass-card {
+  background: var(--panel-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.feature-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.feature-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  gap: 0.75rem;
+}
+
+.feature-item strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.feature-bullet {
+  color: var(--accent);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 0.05rem;
+}
+
+/* ─── Action footer ──────────────────────────── */
+.action-footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 1.1rem 1.5rem;
+  border-radius: 16px;
+  border: none;
+  background: var(--accent-grad);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 18px var(--accent-glow);
+  transition: var(--spring);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.18), transparent);
+  transform: skewX(-25deg);
+  transition: left 0.75s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.40);
+}
+
+.btn-primary:hover::before {
+  left: 130%;
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+.footer-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
