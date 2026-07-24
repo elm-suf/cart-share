@@ -1,15 +1,15 @@
-@layer theme, base, components, utilities;
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css';
-
 @import '@spartan-ng/brain/hlm-tailwind-preset.css';
-/* =============================================
-CartShare Global Design System
-Dark-mode-first, mobile-first premium UI
-============================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@layer theme, base, components, utilities;
+
+/* =============================================
+   CartShare Global Design System
+   Dark-mode-first, mobile-first premium UI
+   ============================================= */
 
 :root {
   --bg: #08090c;
