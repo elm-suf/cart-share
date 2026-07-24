@@ -1,7 +1,9 @@
 <div class="list-page">
-  <!-- Glowing visual blobs -->
-  <div class="glow-orb"></div>
-  <div class="glow-orb-2"></div>
+  <!-- Glowing visual blobs wrapped in clipping container -->
+  <div class="bg-glow-container">
+    <div class="glow-orb"></div>
+    <div class="glow-orb-2"></div>
+  </div>
 
   @if (loading()) {
     <div class="state-container">
