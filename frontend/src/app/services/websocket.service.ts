@@ -56,6 +56,8 @@ export class WebsocketService implements OnDestroy {
         const message: WsMessageServer = JSON.parse(event.data);
         if (message.type === 'sync') {
           this.items.set(message.items);
+        } else if (message.type === 'item_broadcast') {
+          this.handleBroadcast(message);
         } else if (message.type === 'error') {
           this.error.set(message.message);
         }
@@ -63,7 +65,6 @@ export class WebsocketService implements OnDestroy {
         console.error('Failed to parse WebSocket message', e);
       }
     };
-
     this.ws.onclose = () => {
       this.isConnected.set(false);
       
@@ -76,6 +77,53 @@ export class WebsocketService implements OnDestroy {
       console.error('WebSocket error:', err);
       // onclose will handle reconnection
     };
+  }
+
+  private handleBroadcast(message: any) {
+    const { action, item, itemId } = message;
+    this.items.update(current => {
+      if (action === 'add' && item) {
+        // Prevent duplicate if we already applied optimistically
+        if (current.some(i => i.id === item.id)) {
+          return current.map(i => i.id === item.id && item.updated_at >= i.updated_at ? item : i);
+        }
+        return [...current, item].sort((a, b) => a.position - b.position);
+      } else if (action === 'update' && item) {
+        return current.map(i => {
+          if (i.id === item.id) {
+            return item.updated_at >= i.updated_at ? item : i;
+          }
+          return i;
+        }).sort((a, b) => a.position - b.position);
+      } else if (action === 'delete' && itemId) {
+        return current.filter(i => i.id !== itemId);
+      }
+      return current;
+    });
+  }
+
+  addItem(item: Item) {
+    this.items.update(current => [...current, item].sort((a, b) => a.position - b.position));
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      const msg: WsMessageClient = { type: 'item_add', item };
+      this.ws.send(JSON.stringify(msg));
+    }
+  }
+
+  updateItem(item: Item) {
+    this.items.update(current => current.map(i => i.id === item.id ? item : i).sort((a, b) => a.position - b.position));
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      const msg: WsMessageClient = { type: 'item_update', item };
+      this.ws.send(JSON.stringify(msg));
+    }
+  }
+
+  deleteItem(itemId: string) {
+    this.items.update(current => current.filter(i => i.id !== itemId));
+    if (this.ws?.readyState === WebSocket.OPEN) {
+      const msg: WsMessageClient = { type: 'item_delete', itemId };
+      this.ws.send(JSON.stringify(msg));
+    }
   }
 
   private attemptReconnect() {

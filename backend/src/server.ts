@@ -91,6 +91,17 @@ wss.on('connection', (ws: WebSocket) => {
     try {
       const parsed: WsMessageClient = JSON.parse(message.toString());
 
+      const broadcast = (payload: any) => {
+        if (currentRoom && rooms.has(currentRoom)) {
+          const messageStr = JSON.stringify(payload);
+          rooms.get(currentRoom)!.forEach(client => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+              client.send(messageStr);
+            }
+          });
+        }
+      };
+
       if (parsed.type === 'join') {
         const { shareToken } = parsed;
         
@@ -122,6 +133,53 @@ wss.on('connection', (ws: WebSocket) => {
         }));
 
         ws.send(JSON.stringify({ type: 'sync', items: formattedItems }));
+      } else if (parsed.type === 'item_add') {
+        if (!currentRoom) return;
+        const list = db.prepare('SELECT id FROM lists WHERE share_token = ?').get(currentRoom) as any;
+        if (!list) return;
+
+        const { item } = parsed;
+        const stmt = db.prepare(`
+          INSERT INTO items (id, list_id, name, quantity, checked, position, updated_at, editor)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+        stmt.run(item.id, list.id, item.name, item.quantity || null, item.checked ? 1 : 0, item.position, item.updated_at, item.editor || null);
+        
+        db.prepare('UPDATE lists SET updated_at = ?, last_active_at = ? WHERE id = ?').run(Date.now(), Date.now(), list.id);
+
+        broadcast({ type: 'item_broadcast', action: 'add', item });
+      } else if (parsed.type === 'item_update') {
+        if (!currentRoom) return;
+        const list = db.prepare('SELECT id FROM lists WHERE share_token = ?').get(currentRoom) as any;
+        if (!list) return;
+
+        const { item } = parsed;
+        // Last-write-wins: only update if the incoming updated_at is >= the stored one
+        const currentItem = db.prepare('SELECT updated_at FROM items WHERE id = ?').get(item.id) as any;
+        
+        if (!currentItem || item.updated_at >= currentItem.updated_at) {
+          const stmt = db.prepare(`
+            UPDATE items 
+            SET name = ?, quantity = ?, checked = ?, position = ?, updated_at = ?, editor = ?
+            WHERE id = ?
+          `);
+          stmt.run(item.name, item.quantity || null, item.checked ? 1 : 0, item.position, item.updated_at, item.editor || null, item.id);
+          
+          db.prepare('UPDATE lists SET updated_at = ?, last_active_at = ? WHERE id = ?').run(Date.now(), Date.now(), list.id);
+          
+          broadcast({ type: 'item_broadcast', action: 'update', item });
+        }
+      } else if (parsed.type === 'item_delete') {
+        if (!currentRoom) return;
+        const list = db.prepare('SELECT id FROM lists WHERE share_token = ?').get(currentRoom) as any;
+        if (!list) return;
+
+        const { itemId } = parsed;
+        db.prepare('DELETE FROM items WHERE id = ?').run(itemId);
+        
+        db.prepare('UPDATE lists SET updated_at = ?, last_active_at = ? WHERE id = ?').run(Date.now(), Date.now(), list.id);
+        
+        broadcast({ type: 'item_broadcast', action: 'delete', itemId });
       }
     } catch (e) {
       console.error('Failed to parse WebSocket message:', e);

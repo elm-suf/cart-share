@@ -42,12 +42,72 @@
     </header>
 
     <main class="list-content">
-      <!-- Item list placeholders (CRUD will be added in Ticket 05) -->
-      <div class="empty-state">
-        <div class="empty-state-icon">🛒</div>
-        <h3 class="empty-state-title">Your list is empty</h3>
-        <p class="empty-state-desc">Items added here sync in real-time with other shoppers.</p>
-      </div>
+      <form class="add-item-form glass-card" (submit)="addNewItem(); $event.preventDefault()">
+        <input type="text" 
+               class="item-name-input" 
+               placeholder="Add an item (e.g. Milk)" 
+               [ngModel]="newItemName()" 
+               (ngModelChange)="newItemName.set($event)"
+               name="itemName"
+               autocomplete="off" />
+        <input type="text" 
+               class="item-qty-input" 
+               placeholder="Qty (e.g. 2L)" 
+               [ngModel]="newItemQuantity()" 
+               (ngModelChange)="newItemQuantity.set($event)"
+               name="itemQty"
+               autocomplete="off" />
+        <button type="submit" class="btn-primary add-btn" [disabled]="!newItemName().trim()">Add</button>
+      </form>
+
+      @if (wsService.items().length === 0) {
+        <div class="empty-state">
+          <div class="empty-state-icon">🛒</div>
+          <h3 class="empty-state-title">Your list is empty</h3>
+          <p class="empty-state-desc">Items added here sync in real-time with other shoppers.</p>
+        </div>
+      } @else {
+        <div class="items-container">
+          @if (activeItems().length > 0) {
+            <ul class="item-list active-items">
+              @for (item of activeItems(); track item.id) {
+                <li class="item-row glass-card">
+                  <button class="check-btn" (click)="toggleItem(item)" aria-label="Check item"></button>
+                  <div class="item-details">
+                    <span class="item-name">{{ item.name }}</span>
+                    @if (item.quantity) {
+                      <span class="item-qty">{{ item.quantity }}</span>
+                    }
+                    <div class="item-meta">Added by {{ item.editor || 'Someone' }}</div>
+                  </div>
+                  <button class="delete-btn" (click)="deleteItem(item.id)" aria-label="Delete item">×</button>
+                </li>
+              }
+            </ul>
+          }
+
+          @if (checkedItems().length > 0) {
+            <div class="checked-section">
+              <h3 class="checked-title">Checked Items</h3>
+              <ul class="item-list checked-items">
+                @for (item of checkedItems(); track item.id) {
+                  <li class="item-row checked glass-card">
+                    <button class="check-btn checked" (click)="toggleItem(item)" aria-label="Uncheck item">✓</button>
+                    <div class="item-details">
+                      <span class="item-name">{{ item.name }}</span>
+                      @if (item.quantity) {
+                        <span class="item-qty">{{ item.quantity }}</span>
+                      }
+                      <div class="item-meta">Checked by {{ item.editor || 'Someone' }}</div>
+                    </div>
+                    <button class="delete-btn" (click)="deleteItem(item.id)" aria-label="Delete item">×</button>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      }
     </main>
 
     @if (showNicknamePrompt()) {

@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ListRegistryService } from '../services/list-registry.service';
 import { WebsocketService } from '../services/websocket.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Item } from '../shared/websocket';
 
 interface ListData {
   shareToken: string;
@@ -31,6 +32,12 @@ export class ListComponent implements OnInit, OnDestroy {
   
   showNicknamePrompt = signal<boolean>(false);
   nicknameInput = signal<string>('');
+
+  newItemName = signal<string>('');
+  newItemQuantity = signal<string>('');
+
+  activeItems = computed(() => this.wsService.items().filter(i => !i.checked));
+  checkedItems = computed(() => this.wsService.items().filter(i => i.checked));
 
   ngOnInit(): void {
     const token = this.route.snapshot.paramMap.get('shareToken');
@@ -104,5 +111,46 @@ export class ListComponent implements OnInit, OnDestroy {
   skipNickname(): void {
     this.listRegistryService.setNickname('Someone');
     this.showNicknamePrompt.set(false);
+  }
+
+  addNewItem(): void {
+    const name = this.newItemName().trim();
+    if (!name || !this.listData()) return;
+
+    const quantity = this.newItemQuantity().trim();
+    
+    // Find highest position
+    const items = this.wsService.items();
+    const position = items.length > 0 ? Math.max(...items.map(i => i.position)) + 65536 : 65536;
+
+    const newItem: Item = {
+      id: crypto.randomUUID(),
+      list_id: 0, // Not used by client
+      name,
+      quantity,
+      checked: false,
+      position,
+      updated_at: Date.now(),
+      editor: this.listRegistryService.getNickname() || 'Someone'
+    };
+
+    this.wsService.addItem(newItem);
+    
+    this.newItemName.set('');
+    this.newItemQuantity.set('');
+  }
+
+  toggleItem(item: Item): void {
+    const updatedItem: Item = {
+      ...item,
+      checked: !item.checked,
+      updated_at: Date.now(),
+      editor: this.listRegistryService.getNickname() || 'Someone'
+    };
+    this.wsService.updateItem(updatedItem);
+  }
+
+  deleteItem(id: string): void {
+    this.wsService.deleteItem(id);
   }
 }

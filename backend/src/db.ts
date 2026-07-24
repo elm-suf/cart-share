@@ -32,12 +32,23 @@ db.exec(`
     quantity TEXT,
     checked INTEGER NOT NULL DEFAULT 0,
     position REAL NOT NULL,
-    updated_at INTEGER NOT NULL
+    updated_at INTEGER NOT NULL,
+    editor TEXT
   );
 
   CREATE INDEX IF NOT EXISTS idx_lists_share_token ON lists(share_token);
   CREATE INDEX IF NOT EXISTS idx_items_list_id ON items(list_id);
 `);
+
+// Graceful migration for existing databases missing the editor column
+try {
+  db.exec('ALTER TABLE items ADD COLUMN editor TEXT;');
+} catch (e: any) {
+  // Ignore error if column already exists
+  if (!e.message.includes('duplicate column name')) {
+    console.error('Migration error:', e.message);
+  }
+}
 
 console.log(`📂 SQLite database initialized at ${dbPath}`);
 
