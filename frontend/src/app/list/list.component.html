@@ -49,5 +49,26 @@
         <p class="empty-state-desc">Items added here sync in real-time with other shoppers.</p>
       </div>
     </main>
+
+    @if (showNicknamePrompt()) {
+      <div class="nickname-overlay">
+        <div class="nickname-modal glass-card">
+          <h2 class="modal-title">What should we call you?</h2>
+          <p class="modal-desc">This helps others see who added or checked off items.</p>
+          <div class="modal-actions">
+            <input type="text" 
+                   class="nickname-input" 
+                   placeholder="Your name" 
+                   [ngModel]="nicknameInput()" 
+                   (ngModelChange)="nicknameInput.set($event)"
+                   (keyup.enter)="saveNickname()" />
+            <div class="btn-group">
+              <button class="btn-secondary" (click)="skipNickname()">Skip</button>
+              <button class="btn-primary" (click)="saveNickname()">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
   }
 </div>

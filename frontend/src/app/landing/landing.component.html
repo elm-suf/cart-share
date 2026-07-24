@@ -20,30 +20,49 @@
     </p>
   </header>
 
-  <!-- Feature Card -->
-  <main class="intro-section">
-    <div class="glass-card">
-      <h2 class="feature-title">Why CartShare?</h2>
-      <ul class="feature-list">
-        <li class="feature-item">
-          <span class="feature-bullet">✓</span>
-          <span><strong>Real-time sync</strong> — see items added or checked off the moment it happens.</span>
-        </li>
-        <li class="feature-item">
-          <span class="feature-bullet">✓</span>
-          <span><strong>Offline-first</strong> — works smoothly inside stores with low signal.</span>
-        </li>
-        <li class="feature-item">
-          <span class="feature-bullet">✓</span>
-          <span><strong>No account needed</strong> — just share a link to start collaborating.</span>
-        </li>
-        <li class="feature-item">
-          <span class="feature-bullet">✓</span>
-          <span><strong>Multi-list dashboard</strong> — manage all your lists from one place.</span>
-        </li>
-      </ul>
-    </div>
-  </main>
+  @if (lists.length > 0) {
+    <!-- Dashboard Section -->
+    <main class="dashboard-section">
+      <div class="glass-card">
+        <h2 class="feature-title">Your Lists</h2>
+        <ul class="feature-list">
+          @for (list of lists; track list.shareToken) {
+            <li class="feature-item dashboard-item" (click)="onCreateList()">
+              <a [href]="'/list/' + list.shareToken" class="dashboard-link">
+                <span class="dashboard-list-name">{{ list.name }}</span>
+                <span class="dashboard-list-meta" *ngIf="list.isCreator">Creator</span>
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    </main>
+  } @else {
+    <!-- Feature Card -->
+    <main class="intro-section">
+      <div class="glass-card">
+        <h2 class="feature-title">Why CartShare?</h2>
+        <ul class="feature-list">
+          <li class="feature-item">
+            <span class="feature-bullet">✓</span>
+            <span><strong>Real-time sync</strong> — see items added or checked off the moment it happens.</span>
+          </li>
+          <li class="feature-item">
+            <span class="feature-bullet">✓</span>
+            <span><strong>Offline-first</strong> — works smoothly inside stores with low signal.</span>
+          </li>
+          <li class="feature-item">
+            <span class="feature-bullet">✓</span>
+            <span><strong>No account needed</strong> — just share a link to start collaborating.</span>
+          </li>
+          <li class="feature-item">
+            <span class="feature-bullet">✓</span>
+            <span><strong>Multi-list dashboard</strong> — manage all your lists from one place.</span>
+          </li>
+        </ul>
+      </div>
+    </main>
+  }
 
   <!-- Action Footer -->
   <footer class="action-footer">
