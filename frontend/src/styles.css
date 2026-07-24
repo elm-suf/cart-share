@@ -50,22 +50,38 @@ body {
   justify-content: center;
   align-items: flex-start;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── Mobile-frame container ─────────────────── */
+/* ─── Mobile-frame container (Mobile first) ──── */
 .app-container {
   width: 100%;
-  max-width: 480px;
   min-height: 100vh;
+  min-height: 100dvh;
   background-color: #0b0c10;
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
-  box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+
+/* Desktop-frame styling for larger viewports */
+@media (min-width: 480px) and (min-height: 640px) {
+  body {
+    align-items: center;
+    padding: 2rem 0;
+  }
+  .app-container {
+    max-width: 450px;
+    height: calc(100vh - 4rem);
+    min-height: 700px;
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
 }
 
 /* ─── Landing page layout ────────────────────── */
@@ -76,7 +92,7 @@ body {
   justify-content: space-between;
   padding: 2.5rem 1.75rem 2rem;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* ─── Ambient glow blobs ─────────────────────── */
@@ -564,4 +580,43 @@ body {
   border-color: var(--text-secondary);
   background: rgba(255, 255, 255, 0.03);
 }
+
+/* ─── Narrow Screen Responsive Adjustments ───── */
+@media (max-width: 375px) {
+  .landing-page {
+    padding: 1.5rem 1.1rem;
+  }
+  .list-page {
+    padding: 1.25rem 1rem;
+  }
+  .brand-name {
+    font-size: 2rem;
+  }
+  .logo-wrapper {
+    width: 56px;
+    height: 56px;
+  }
+  .logo-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .glass-card {
+    padding: 1.25rem 1rem;
+  }
+  .feature-title {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .feature-list {
+    gap: 0.6rem;
+  }
+  .feature-item {
+    font-size: 0.85rem;
+  }
+  .btn-primary {
+    padding: 0.95rem 1.25rem;
+    font-size: 0.95rem;
+  }
+}
+
 
