@@ -1,6 +1,7 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ListRegistryService } from '../services/list-registry.service';
+import { WebsocketService } from '../services/websocket.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -17,9 +18,10 @@ interface ListData {
   imports: [RouterModule, CommonModule, FormsModule],
   templateUrl: './list.component.html',
 })
-export class ListComponent implements OnInit {
+export class ListComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private listRegistryService = inject(ListRegistryService);
+  public wsService = inject(WebsocketService);
 
   shareToken = signal<string | null>(null);
   listData = signal<ListData | null>(null);
@@ -37,10 +39,15 @@ export class ListComponent implements OnInit {
     if (token) {
       this.shareUrl.set(`${window.location.origin}/list/${token}`);
       this.fetchListDetails(token);
+      this.wsService.connect(token);
     } else {
       this.errorMessage.set('Invalid list link.');
       this.loading.set(false);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.wsService.disconnect();
   }
 
   fetchListDetails(token: string): void {

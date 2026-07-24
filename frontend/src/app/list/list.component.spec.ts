@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideZonelessChangeDetection } from '@angular/core';
+import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { ListComponent } from './list.component';
 import { ListRegistryService } from '../services/list-registry.service';
+import { WebsocketService } from '../services/websocket.service';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
@@ -9,6 +10,7 @@ describe('ListComponent', () => {
   let component: ListComponent;
   let fixture: ComponentFixture<ListComponent>;
   let mockListRegistryService: any;
+  let mockWebsocketService: any;
   let mockRoute: any;
 
   beforeEach(async () => {
@@ -17,6 +19,15 @@ describe('ListComponent', () => {
       getNickname: vi.fn(),
       setNickname: vi.fn()
     };
+    
+    mockWebsocketService = {
+      connect: vi.fn(),
+      disconnect: vi.fn(),
+      isConnected: signal(false),
+      items: signal([]),
+      error: signal(null)
+    };
+    
     mockRoute = {
       snapshot: { paramMap: { get: () => 'test-token' } }
     };
@@ -29,6 +40,7 @@ describe('ListComponent', () => {
       providers: [
         provideZonelessChangeDetection(),
         { provide: ListRegistryService, useValue: mockListRegistryService },
+        { provide: WebsocketService, useValue: mockWebsocketService },
         { provide: ActivatedRoute, useValue: mockRoute }
       ]
     })

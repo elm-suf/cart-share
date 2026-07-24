@@ -3,6 +3,9 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 import db from './db.js';
+import http from 'http';
+import { WebSocketServer, WebSocket } from 'ws';
+import { WsMessageClient, Item } from './shared/websocket.js';
 
 dotenv.config();
 
@@ -76,6 +79,67 @@ app.get('/api/lists/:shareToken', (req: Request, res: Response) => {
   }
 });
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+const wss = new WebSocketServer({ server, path: '/ws' });
+
+const rooms = new Map<string, Set<WebSocket>>();
+
+wss.on('connection', (ws: WebSocket) => {
+  let currentRoom: string | null = null;
+
+  ws.on('message', (message: string) => {
+    try {
+      const parsed: WsMessageClient = JSON.parse(message.toString());
+
+      if (parsed.type === 'join') {
+        const { shareToken } = parsed;
+        
+        // Verify list exists
+        const list = db.prepare('SELECT id FROM lists WHERE share_token = ?').get(shareToken) as any;
+        if (!list) {
+          ws.send(JSON.stringify({ type: 'error', message: 'List not found' }));
+          return;
+        }
+
+        // Leave previous room if any
+        if (currentRoom && rooms.has(currentRoom)) {
+          rooms.get(currentRoom)!.delete(ws);
+        }
+
+        // Join new room
+        currentRoom = shareToken;
+        if (!rooms.has(shareToken)) {
+          rooms.set(shareToken, new Set());
+        }
+        rooms.get(shareToken)!.add(ws);
+
+        // Fetch items
+        const items = db.prepare('SELECT * FROM items WHERE list_id = ? ORDER BY position').all(list.id) as any[];
+        
+        const formattedItems = items.map(item => ({
+          ...item,
+          checked: !!item.checked
+        }));
+
+        ws.send(JSON.stringify({ type: 'sync', items: formattedItems }));
+      }
+    } catch (e) {
+      console.error('Failed to parse WebSocket message:', e);
+    }
+  });
+
+  ws.on('close', () => {
+    if (currentRoom && rooms.has(currentRoom)) {
+      const room = rooms.get(currentRoom)!;
+      room.delete(ws);
+      if (room.size === 0) {
+        rooms.delete(currentRoom);
+      }
+    }
+  });
+});
+
+server.listen(PORT, () => {
   console.log(`✅ Backend running at http://localhost:${PORT}/api/health`);
+  console.log(`🔌 WebSocket server listening on path /ws`);
 });
