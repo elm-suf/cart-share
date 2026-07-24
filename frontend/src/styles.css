@@ -1,35 +1,44 @@
+@layer theme, base, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
+@import 'tailwindcss/utilities.css';
+
+@import '@spartan-ng/brain/hlm-tailwind-preset.css';
 /* =============================================
-   CartShare Global Design System
-   Dark-mode-first, mobile-first premium UI
-   ============================================= */
+CartShare Global Design System
+Dark-mode-first, mobile-first premium UI
+============================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg:             #08090c;
-  --panel-bg:       rgba(22, 25, 34, 0.70);
-  --border:         rgba(255, 255, 255, 0.08);
-  --text-primary:   #f3f4f6;
+  --bg: #08090c;
+  --panel-bg: rgba(22, 25, 34, 0.7);
+  --border: rgba(255, 255, 255, 0.08);
+  --text-primary: #f3f4f6;
   --text-secondary: #9ca3af;
-  --text-muted:     #4b5563;
-  --accent:         #10b981;
-  --accent-glow:    rgba(16, 185, 129, 0.22);
-  --accent-hover:   #059669;
-  --accent-grad:    linear-gradient(135deg, #10b981, #06b6d4);
-  --font:           'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --shadow-sm:      0 2px 8px rgba(0, 0, 0, 0.40);
-  --shadow-lg:      0 10px 30px rgba(0, 0, 0, 0.60);
-  --spring:         all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --smooth:         all 0.25s ease;
+  --text-muted: #4b5563;
+  --accent: #10b981;
+  --accent-glow: rgba(16, 185, 129, 0.22);
+  --accent-hover: #059669;
+  --accent-grad: linear-gradient(135deg, #10b981, #06b6d4);
+  --font: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.6);
+  --spring: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --smooth: all 0.25s ease;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -233,14 +242,14 @@ body {
   left: -60%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.18), transparent);
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.18), transparent);
   transform: skewX(-25deg);
   transition: left 0.75s ease;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.40);
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
 }
 
 .btn-primary:hover::before {
@@ -254,4 +263,80 @@ body {
 .footer-note {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+:root {
+  color-scheme: light;
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+:root.dark {
+  color-scheme: dark;
+
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.985 0 0);
+  --sidebar-primary-foreground: oklch(0.205 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
