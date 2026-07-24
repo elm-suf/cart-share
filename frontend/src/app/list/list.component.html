@@ -1,0 +1,51 @@
+<div class="list-page">
+  <!-- Glowing visual blobs -->
+  <div class="glow-orb"></div>
+  <div class="glow-orb-2"></div>
+
+  @if (loading()) {
+    <div class="state-container">
+      <div class="loading-spinner"></div>
+      <p class="state-text">Loading grocery list...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="state-container">
+      <div class="error-icon">⚠</div>
+      <h2 class="error-title">Unable to Load List</h2>
+      <p class="error-message">{{ errorMessage() }}</p>
+      <a routerLink="/" class="btn-secondary">Go to Dashboard</a>
+    </div>
+  } @else if (listData()) {
+    <header class="list-header">
+      <div class="header-top">
+        <a routerLink="/" class="back-link">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"/>
+            <polyline points="12 19 5 12 12 5"/>
+          </svg>
+        </a>
+        <h1 class="list-title">{{ listData()?.name }}</h1>
+        <div class="header-spacer"></div>
+      </div>
+
+      <!-- Share link bar -->
+      <div class="share-bar">
+        <div class="share-url-container">
+          <span class="share-url-label">Share link:</span>
+          <span class="share-url-text">{{ shareUrl() }}</span>
+        </div>
+        <button class="btn-copy" (click)="copyLink()">Copy</button>
+      </div>
+    </header>
+
+    <main class="list-content">
+      <!-- Item list placeholders (CRUD will be added in Ticket 05) -->
+      <div class="empty-state">
+        <div class="empty-state-icon">🛒</div>
+        <h3 class="empty-state-title">Your list is empty</h3>
+        <p class="empty-state-desc">Items added here sync in real-time with other shoppers.</p>
+      </div>
+    </main>
+  }
+</div>
