@@ -1,5 +1,6 @@
 import { Injectable, signal, OnDestroy } from '@angular/core';
 import { Item, WsMessageServer, WsMessageClient } from '../shared/websocket';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -65,10 +66,8 @@ export class WebsocketService implements OnDestroy {
   private establishConnection() {
     if (!this.currentShareToken) return;
 
-    // Determine WS URL (use wss:// if https)
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    // For dev, proxy routes /ws to the backend. In prod, it should be the same.
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
+    // For dev, proxy routes /ws to the backend. In prod, it points to the remote backend.
+    const wsUrl = environment.wsUrl;
 
     this.ws = new WebSocket(wsUrl);
 

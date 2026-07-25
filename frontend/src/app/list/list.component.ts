@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { environment } from '../../environments/environment';
 import { ListRegistryService } from '../services/list-registry.service';
 import { WebsocketService } from '../services/websocket.service';
 import { CommonModule } from '@angular/common';
@@ -66,7 +67,7 @@ export class ListComponent implements OnInit, OnDestroy {
   }
 
   fetchListDetails(token: string): void {
-    fetch(`/api/lists/${token}`)
+    fetch(`${environment.apiUrl}/lists/${token}`)
       .then((res) => {
         if (!res.ok) {
           if (res.status === 404 || res.status === 410) {
@@ -144,7 +145,7 @@ export class ListComponent implements OnInit, OnDestroy {
     
     if (!token || !creatorToken) return;
 
-    fetch(`/api/lists/${token}/name`, {
+    fetch(`${environment.apiUrl}/lists/${token}/name`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -184,7 +185,7 @@ export class ListComponent implements OnInit, OnDestroy {
     if (!token || !creatorToken) return;
 
     this.isRotating.set(true);
-    fetch(`/api/lists/${token}/rotate`, {
+    fetch(`${environment.apiUrl}/lists/${token}/rotate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

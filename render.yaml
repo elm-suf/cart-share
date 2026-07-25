@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: cart-share-backend
+    env: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    plan: free # Note: free tier will have ephemeral disk. Upgrade to starter for persistent disk.
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: FRONTEND_URL
+        value: https://cart-share.vercel.app
+      # Uncomment the below and configure a disk if you upgrade to the starter plan
+      # - key: DB_PATH
+      #   value: /var/data/database.db
+    # disk:
+    #   name: sqlite-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
