@@ -4,11 +4,11 @@
 
 **Blocked by:** 04 — WebSocket Server & Real-time Room Sync
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] SQLite database schema includes an `items` table with columns: `id` (VARCHAR/INTEGER PRIMARY KEY), `list_id` (INTEGER REFERENCES lists), `name` (VARCHAR), `quantity` (VARCHAR, optional), `checked` (INTEGER/BOOLEAN), `position` (REAL), `updated_at` (TIMESTAMP).
-- [ ] Client interface allows typing a name (e.g. "milk"), selecting/typing an optional quantity (e.g., "x 2"), and pressing Enter to add it.
-- [ ] When an item is added, checked/unchecked, or deleted, the client applies the change optimistically to the local state immediately, and sends the action over the WebSocket.
-- [ ] Server receives the update, writes to SQLite (using last-write-wins per-field conflict resolution comparing modification timestamps if needed), and broadcasts the update event to other clients in the room.
-- [ ] Active items and Checked items are rendered in two distinct lists in the UI, with checked items transitioning smoothly between the lists.
-- [ ] List items display the nickname of the Editor who added them or last checked them, providing clear shopping context.
+- [x] SQLite database schema includes an `items` table with columns: `id` (VARCHAR/INTEGER PRIMARY KEY), `list_id` (INTEGER REFERENCES lists), `name` (VARCHAR), `quantity` (VARCHAR, optional), `checked` (INTEGER/BOOLEAN), `position` (REAL), `updated_at` (TIMESTAMP).
+- [x] Client interface allows typing a name (e.g. "milk"), selecting/typing an optional quantity (e.g., "x 2"), and pressing Enter to add it.
+- [x] When an item is added, checked/unchecked, or deleted, the client applies the change optimistically to the local state immediately, and sends the action over the WebSocket.
+- [x] Server receives the update, writes to SQLite (using last-write-wins per-field conflict resolution comparing modification timestamps if needed), and broadcasts the update event to other clients in the room.
+- [x] Active items and Checked items are rendered in two distinct lists in the UI, with checked items transitioning smoothly between the lists.
+- [x] List items display the nickname of the Editor who added them or last checked them, providing clear shopping context.

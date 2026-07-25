@@ -65,4 +65,20 @@
     </button>
     <p class="text-xs text-muted-foreground">Built for modern household coordination</p>
   </footer>
+
+  @if (showCreatePrompt()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm nickname-overlay">
+      <div class="bg-card border border-border w-full max-w-sm rounded-2xl p-6 shadow-lg flex flex-col">
+        <h2 class="text-xl font-bold text-foreground mb-2">Name your list</h2>
+        <p class="text-sm text-muted-foreground mb-6 leading-relaxed">Give your new grocery list a name (optional).</p>
+        <div class="flex flex-col gap-4">
+          <input type="text" class="w-full bg-background border border-border text-foreground text-base px-4 py-3 rounded-xl outline-none focus:border-primary transition-colors placeholder:text-muted-foreground" placeholder="e.g., Weekend Groceries" [ngModel]="newListNameInput()" (ngModelChange)="newListNameInput.set($event)" (keyup.enter)="submitCreateList()" />
+          <div class="flex gap-3">
+            <button class="flex-1 bg-muted/50 text-foreground border border-border py-3 rounded-xl font-semibold cursor-pointer hover:bg-muted transition-colors" (click)="cancelCreateList()">Cancel</button>
+            <button class="flex-1 bg-primary text-primary-foreground border-none py-3 rounded-xl font-semibold cursor-pointer hover:-translate-y-px shadow-sm transition-transform disabled:opacity-50" (click)="submitCreateList()">Create</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 </div>

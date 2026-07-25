@@ -79,6 +79,43 @@ app.get('/api/lists/:shareToken', (req: Request, res: Response) => {
   }
 });
 
+// Update list name
+app.put('/api/lists/:shareToken/name', (req: Request, res: Response) => {
+  try {
+    const { shareToken } = req.params;
+    const { name, creatorToken } = req.body;
+
+    if (!name || typeof name !== 'string' || name.trim() === '') {
+      return res.status(400).json({ error: 'Valid name is required' });
+    }
+
+    if (!creatorToken || typeof creatorToken !== 'string') {
+      return res.status(401).json({ error: 'Creator token is required' });
+    }
+
+    // Verify list exists
+    const list = db.prepare('SELECT id, creator_token_hash FROM lists WHERE share_token = ?').get(shareToken) as any;
+    
+    if (!list) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+
+    // Verify creator token
+    const creatorTokenHash = crypto.createHash('sha256').update(creatorToken).digest('hex');
+    if (creatorTokenHash !== list.creator_token_hash) {
+      return res.status(403).json({ error: 'Forbidden: only the creator can edit the list name' });
+    }
+
+    // Update name
+    db.prepare('UPDATE lists SET name = ?, updated_at = ? WHERE id = ?').run(name.trim(), Date.now(), list.id);
+
+    res.json({ success: true, name: name.trim() });
+  } catch (error) {
+    console.error('Failed to update list name:', error);
+    res.status(500).json({ error: 'Failed to update list name' });
+  }
+});
+
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: '/ws' });
 

@@ -34,6 +34,10 @@ export class ListComponent implements OnInit, OnDestroy {
   showNicknamePrompt = signal<boolean>(false);
   nicknameInput = signal<string>('');
 
+  isCreator = signal<boolean>(false);
+  isEditingName = signal<boolean>(false);
+  editNameInput = signal<string>('');
+
   newItemName = signal<string>('');
   newItemQuantity = signal<string>('');
 
@@ -72,7 +76,10 @@ export class ListComponent implements OnInit, OnDestroy {
         this.listData.set(data);
         
         // Auto-register list
-        const isCreator = !!localStorage.getItem(`creator_token_${token}`);
+        const creatorToken = localStorage.getItem(`creator_token_${token}`);
+        const isCreator = !!creatorToken;
+        this.isCreator.set(isCreator);
+        
         this.listRegistryService.addList({
           shareToken: token,
           name: data.name,
@@ -113,6 +120,58 @@ export class ListComponent implements OnInit, OnDestroy {
   skipNickname(): void {
     this.listRegistryService.setNickname('Someone');
     this.showNicknamePrompt.set(false);
+  }
+
+  startEditingName(): void {
+    this.editNameInput.set(this.listData()?.name || '');
+    this.isEditingName.set(true);
+  }
+
+  saveListName(): void {
+    const name = this.editNameInput().trim();
+    if (!name || name === this.listData()?.name) {
+      this.isEditingName.set(false);
+      return;
+    }
+
+    const token = this.shareToken();
+    const creatorToken = localStorage.getItem(`creator_token_${token}`);
+    
+    if (!token || !creatorToken) return;
+
+    fetch(`/api/lists/${token}/name`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, creatorToken }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to update name');
+        return res.json();
+      })
+      .then((data) => {
+        const currentData = this.listData();
+        if (currentData) {
+          this.listData.set({ ...currentData, name: data.name });
+        }
+        
+        // Update registry
+        const lists = this.listRegistryService.getLists();
+        const listIndex = lists.findIndex(l => l.shareToken === token);
+        if (listIndex !== -1) {
+          const updatedLists = [...lists];
+          updatedLists[listIndex].name = data.name;
+          localStorage.setItem('grocery_lists', JSON.stringify(updatedLists));
+        }
+      })
+      .catch((err) => {
+        console.error('Error updating list name:', err);
+        alert('Failed to update list name.');
+      })
+      .finally(() => {
+        this.isEditingName.set(false);
+      });
   }
 
   addNewItem(): void {
