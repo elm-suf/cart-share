@@ -4,11 +4,11 @@
 
 **Blocked by:** None — can start immediately.
 
-**Status:** ready-for-agent
+**Status:** completed
 
-- [ ] Repository is structured with a root package JSON, `frontend` client folder, and `backend` server folder (or a unified monorepo).
-- [ ] Backend is an Express app running on a configured port (e.g., 3001) with basic hello world endpoint.
-- [ ] Frontend is an Angular + TypeScript app running on its own dev server (e.g., 4200) and proxying `/api` requests to the backend.
-- [ ] A CSS design system is initialized in `styles.css` using modern typography, a dark-mode-first color palette, and premium aesthetics.
-- [ ] Visiting the root route `/` displays a modern landing page with a call-to-action button: "Create a Grocery List".
-- [ ] The app layout is fully responsive, looking like a native mobile app when loaded on a phone screen.
+- [x] Repository is structured with a root package JSON, `frontend` client folder, and `backend` server folder (or a unified monorepo).
+- [x] Backend is an Express app running on a configured port (e.g., 3001) with basic hello world endpoint.
+- [x] Frontend is an Angular + TypeScript app running on its own dev server (e.g., 4200) and proxying `/api` requests to the backend.
+- [x] A CSS design system is initialized in `styles.css` using modern typography, a dark-mode-first color palette, and premium aesthetics.
+- [x] Visiting the root route `/` displays a modern landing page with a call-to-action button: "Create a Grocery List".
+- [x] The app layout is fully responsive, looking like a native mobile app when loaded on a phone screen.

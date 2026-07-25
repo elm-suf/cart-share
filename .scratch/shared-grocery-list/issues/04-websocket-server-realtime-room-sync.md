@@ -4,10 +4,10 @@
 
 **Blocked by:** 03 — Client List Registry, Nickname Prompt & Dashboard
 
-**Status:** ready-for-agent
+**Status:** completed
 
-- [ ] Express server starts a WebSocket server (using the `ws` package) alongside the HTTP server.
-- [ ] Client connects to the WebSocket server on mounting `/list/:shareToken`.
-- [ ] Server handles list room partitioning: when a client connects, they send a `join` event with the `shareToken`, and the server assigns their connection to that list room.
-- [ ] Server responds to the `join` event by fetching and sending the list's current items from SQLite to the client.
-- [ ] Clients maintain reconnection logic, attempting to re-establish the WebSocket connection automatically if dropped.
+- [x] Express server starts a WebSocket server (using the `ws` package) alongside the HTTP server.
+- [x] Client connects to the WebSocket server on mounting `/list/:shareToken`.
+- [x] Server handles list room partitioning: when a client connects, they send a `join` event with the `shareToken`, and the server assigns their connection to that list room.
+- [x] Server responds to the `join` event by fetching and sending the list's current items from SQLite to the client.
+- [x] Clients maintain reconnection logic, attempting to re-establish the WebSocket connection automatically if dropped.
