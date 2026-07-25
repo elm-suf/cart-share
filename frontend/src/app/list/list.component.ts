@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ListRegistryService } from '../services/list-registry.service';
 import { WebsocketService } from '../services/websocket.service';
 import { CommonModule } from '@angular/common';
@@ -22,6 +22,7 @@ interface ListData {
 })
 export class ListComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private listRegistryService = inject(ListRegistryService);
   public wsService = inject(WebsocketService);
 
@@ -38,6 +39,7 @@ export class ListComponent implements OnInit, OnDestroy {
   isCreator = signal<boolean>(false);
   isEditingName = signal<boolean>(false);
   editNameInput = signal<string>('');
+  isRotating = signal<boolean>(false);
 
   newItemName = signal<string>('');
   newItemQuantity = signal<string>('');
@@ -67,8 +69,10 @@ export class ListComponent implements OnInit, OnDestroy {
     fetch(`/api/lists/${token}`)
       .then((res) => {
         if (!res.ok) {
-          if (res.status === 404) throw new Error('List not found.');
-          if (res.status === 410) throw new Error('List has expired or been deleted.');
+          if (res.status === 404 || res.status === 410) {
+            this.listRegistryService.removeList(token);
+            throw new Error(res.status === 404 ? 'List not found.' : 'List has expired or been deleted.');
+          }
           throw new Error('Failed to load list.');
         }
         return res.json();
@@ -158,13 +162,7 @@ export class ListComponent implements OnInit, OnDestroy {
         }
         
         // Update registry
-        const lists = this.listRegistryService.getLists();
-        const listIndex = lists.findIndex(l => l.shareToken === token);
-        if (listIndex !== -1) {
-          const updatedLists = [...lists];
-          updatedLists[listIndex].name = data.name;
-          localStorage.setItem('grocery_lists', JSON.stringify(updatedLists));
-        }
+        this.listRegistryService.updateListName(token, data.name);
       })
       .catch((err) => {
         console.error('Error updating list name:', err);
@@ -172,6 +170,52 @@ export class ListComponent implements OnInit, OnDestroy {
       })
       .finally(() => {
         this.isEditingName.set(false);
+      });
+  }
+
+  rotateLink(): void {
+    if (!confirm('Are you sure you want to rotate the share link? The current link will stop working for everyone.')) {
+      return;
+    }
+    
+    const token = this.shareToken();
+    const creatorToken = localStorage.getItem(`creator_token_${token}`);
+    
+    if (!token || !creatorToken) return;
+
+    this.isRotating.set(true);
+    fetch(`/api/lists/${token}/rotate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ creatorToken }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to rotate link');
+        return res.json();
+      })
+      .then((data) => {
+        if (data.newShareToken) {
+          const newToken = data.newShareToken;
+          
+          // Update localStorage
+          localStorage.setItem(`creator_token_${newToken}`, creatorToken);
+          localStorage.removeItem(`creator_token_${token}`);
+          
+          // Update list registry
+          this.listRegistryService.updateListToken(token, newToken);
+          
+          // Navigate to new list
+          this.router.navigate(['/list', newToken]);
+        }
+      })
+      .catch((err) => {
+        console.error('Error rotating link:', err);
+        alert('Failed to rotate list link.');
+      })
+      .finally(() => {
+        this.isRotating.set(false);
       });
   }
 

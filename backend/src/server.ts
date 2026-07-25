@@ -234,6 +234,48 @@ wss.on('connection', (ws: WebSocket) => {
   });
 });
 
+// Rotate list share link
+app.post('/api/lists/:shareToken/rotate', (req: Request, res: Response) => {
+  try {
+    const { shareToken } = req.params;
+    const { creatorToken } = req.body;
+
+    if (!creatorToken || typeof creatorToken !== 'string') {
+      return res.status(401).json({ error: 'Creator token is required' });
+    }
+
+    const list = db.prepare('SELECT id, creator_token_hash FROM lists WHERE share_token = ?').get(shareToken) as any;
+    
+    if (!list) {
+      return res.status(404).json({ error: 'List not found' });
+    }
+
+    const creatorTokenHash = crypto.createHash('sha256').update(creatorToken).digest('hex');
+    if (creatorTokenHash !== list.creator_token_hash) {
+      return res.status(403).json({ error: 'Forbidden: only the creator can rotate the link' });
+    }
+
+    const newShareToken = crypto.randomBytes(16).toString('hex');
+    db.prepare('UPDATE lists SET share_token = ?, updated_at = ? WHERE id = ?').run(newShareToken, Date.now(), list.id);
+
+    // Close all connections in the old room
+    if (rooms.has(shareToken)) {
+      rooms.get(shareToken)!.forEach(client => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify({ type: 'error', message: 'List share link has been revoked or rotated.' }));
+          client.close(4000, 'Link rotated');
+        }
+      });
+      rooms.delete(shareToken);
+    }
+
+    res.json({ success: true, newShareToken });
+  } catch (error) {
+    console.error('Failed to rotate list link:', error);
+    res.status(500).json({ error: 'Failed to rotate list link' });
+  }
+});
+
 server.listen(PORT, () => {
   console.log(`✅ Backend running at http://localhost:${PORT}/api/health`);
   console.log(`🔌 WebSocket server listening on path /ws`);

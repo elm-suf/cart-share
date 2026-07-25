@@ -41,6 +41,31 @@ export class ListRegistryService {
     localStorage.setItem(this.REGISTRY_KEY, JSON.stringify(lists));
   }
 
+  removeList(shareToken: string): void {
+    const lists = this.getLists().filter(l => l.shareToken !== shareToken);
+    localStorage.setItem(this.REGISTRY_KEY, JSON.stringify(lists));
+  }
+
+  updateListToken(oldToken: string, newToken: string): void {
+    const lists = this.getLists();
+    const existingIndex = lists.findIndex(l => l.shareToken === oldToken);
+    
+    if (existingIndex >= 0) {
+      lists[existingIndex].shareToken = newToken;
+      localStorage.setItem(this.REGISTRY_KEY, JSON.stringify(lists));
+    }
+  }
+
+  updateListName(shareToken: string, newName: string): void {
+    const lists = this.getLists();
+    const existingIndex = lists.findIndex(l => l.shareToken === shareToken);
+    
+    if (existingIndex >= 0) {
+      lists[existingIndex].name = newName;
+      localStorage.setItem(this.REGISTRY_KEY, JSON.stringify(lists));
+    }
+  }
+
   getNickname(): string | null {
     return localStorage.getItem(this.NICKNAME_KEY);
   }
