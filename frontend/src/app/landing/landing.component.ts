@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ListRegistryService, ListRegistryEntry } from '../services/list-registry.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-landing',
@@ -36,7 +37,7 @@ export class LandingComponent implements OnInit {
     const name = this.newListNameInput().trim();
     const payload = name ? { name } : {};
 
-    fetch('/api/lists', {
+    fetch(`${environment.apiUrl}/lists`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

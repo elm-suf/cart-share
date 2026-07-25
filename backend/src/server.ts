@@ -12,7 +12,13 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+const allowedOrigins = [
+  'https://cart-share.vercel.app',
+  'http://localhost:4200',
+  process.env.FRONTEND_URL || ''
+].filter(Boolean);
+
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 // Health Check
