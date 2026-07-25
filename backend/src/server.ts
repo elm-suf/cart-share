@@ -13,7 +13,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 const allowedOrigins = [
-  'https://cart-share.vercel.app',
+  'https://cart-share-fe.vercel.app',
   'http://localhost:4200',
   process.env.FRONTEND_URL || ''
 ].filter(Boolean);

@@ -9,7 +9,7 @@ services:
       - key: PORT
         value: 3000
       - key: FRONTEND_URL
-        value: https://cart-share.vercel.app
+        value: https://cart-share-fe.vercel.app
       # Uncomment the below and configure a disk if you upgrade to the starter plan
       # - key: DB_PATH
       #   value: /var/data/database.db
