@@ -29,6 +29,7 @@ export class ListComponent implements OnInit, OnDestroy {
   loading = signal<boolean>(true);
   errorMessage = signal<string | null>(null);
   shareUrl = signal<string>('');
+  linkCopied = signal<boolean>(false);
   
   showNicknamePrompt = signal<boolean>(false);
   nicknameInput = signal<string>('');
@@ -96,7 +97,8 @@ export class ListComponent implements OnInit, OnDestroy {
 
   copyLink(): void {
     navigator.clipboard.writeText(this.shareUrl()).then(() => {
-      alert('Share link copied to clipboard!');
+      this.linkCopied.set(true);
+      setTimeout(() => this.linkCopied.set(false), 2000);
     }).catch((err) => {
       console.error('Failed to copy link:', err);
     });

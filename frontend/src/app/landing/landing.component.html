@@ -1,36 +1,30 @@
-<div class="landing-page">
-  <!-- Ambient glow blobs wrapped in clipping container -->
-  <div class="bg-glow-container">
-    <div class="glow-orb"></div>
-    <div class="glow-orb-2"></div>
-  </div>
-
+<div class="flex-1 flex flex-col justify-between p-6 overflow-y-auto">
   <!-- Brand Header -->
-  <header class="brand-header">
-    <div class="logo-wrapper">
-      <svg class="logo-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="9" cy="21" r="1"/>
-        <circle cx="20" cy="21" r="1"/>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+  <header class="text-center mt-8 relative z-10">
+    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground mb-6 shadow-sm">
+      <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
       </svg>
     </div>
-    <h1 class="brand-name">CartShare</h1>
-    <p class="brand-tagline">
+    <h1 class="text-4xl font-bold tracking-tight text-foreground mb-2">CartShare</h1>
+    <p class="text-base text-muted-foreground max-w-[300px] mx-auto leading-relaxed">
       Coordinate grocery runs with partners &amp; roommates — instantly.
     </p>
   </header>
 
   @if (lists.length > 0) {
     <!-- Dashboard Section -->
-    <main class="dashboard-section">
-      <div class="glass-card">
-        <h2 class="feature-title">Your Lists</h2>
-        <ul class="feature-list">
+    <main class="relative z-10 my-10 dashboard-section">
+      <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-foreground mb-4">Your Lists</h2>
+        <ul class="flex flex-col gap-3">
           @for (list of lists; track list.shareToken) {
-            <li class="feature-item dashboard-item" (click)="onCreateList()">
-              <a [href]="'/list/' + list.shareToken" class="dashboard-link">
-                <span class="dashboard-list-name">{{ list.name }}</span>
-                <span class="dashboard-list-meta" *ngIf="list.isCreator">Creator</span>
+            <li class="cursor-pointer">
+              <a [href]="'/list/' + list.shareToken" class="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-xl hover:bg-muted/80 transition-colors">
+                <span class="font-medium text-foreground">{{ list.name }}</span>
+                <span class="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full" *ngIf="list.isCreator">Creator</span>
               </a>
             </li>
           }
@@ -39,25 +33,21 @@
     </main>
   } @else {
     <!-- Feature Card -->
-    <main class="intro-section">
-      <div class="glass-card">
-        <h2 class="feature-title">Why CartShare?</h2>
-        <ul class="feature-list">
-          <li class="feature-item">
-            <span class="feature-bullet">✓</span>
-            <span><strong>Real-time sync</strong> — see items added or checked off the moment it happens.</span>
+    <main class="relative z-10 my-10 intro-section">
+      <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
+        <h2 class="text-lg font-semibold text-foreground mb-4">Why CartShare?</h2>
+        <ul class="flex flex-col gap-3">
+          <li class="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
+            <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+            <span><strong class="text-foreground font-semibold">Real-time sync</strong> — see items added or checked off the moment it happens.</span>
           </li>
-          <li class="feature-item">
-            <span class="feature-bullet">✓</span>
-            <span><strong>Offline-first</strong> — works smoothly inside stores with low signal.</span>
+          <li class="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
+            <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+            <span><strong class="text-foreground font-semibold">Offline-first</strong> — works smoothly inside stores with low signal.</span>
           </li>
-          <li class="feature-item">
-            <span class="feature-bullet">✓</span>
-            <span><strong>No account needed</strong> — just share a link to start collaborating.</span>
-          </li>
-          <li class="feature-item">
-            <span class="feature-bullet">✓</span>
-            <span><strong>Multi-list dashboard</strong> — manage all your lists from one place.</span>
+          <li class="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
+            <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
+            <span><strong class="text-foreground font-semibold">No account needed</strong> — just share a link to start collaborating.</span>
           </li>
         </ul>
       </div>
@@ -65,15 +55,14 @@
   }
 
   <!-- Action Footer -->
-  <footer class="action-footer">
-    <button id="create-list-btn" hlmBtn class="btn-primary" (click)="onCreateList()">
+  <footer class="relative z-10 flex flex-col items-center gap-4">
+    <button id="create-list-btn" hlmBtn class="w-full py-4 rounded-xl border-0 bg-primary text-primary-foreground text-lg font-semibold cursor-pointer shadow-sm hover:-translate-y-0.5 hover:shadow-md active:translate-y-px transition-all flex items-center justify-center gap-2" (click)="onCreateList()">
       Create a Grocery List
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="5" y1="12" x2="19" y2="12"/>
-        <polyline points="12 5 19 12 12 19"/>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
       </svg>
     </button>
-    <p class="footer-note">Built for modern household coordination</p>
+    <p class="text-xs text-muted-foreground">Built for modern household coordination</p>
   </footer>
 </div>

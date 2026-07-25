@@ -1,13 +1,12 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { HlmButton } from '@spartan-ng/helm/button';
 import { ListRegistryService, ListRegistryEntry } from '../services/list-registry.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [HlmButton, CommonModule],
+  imports: [CommonModule],
   templateUrl: './landing.component.html',
 })
 export class LandingComponent implements OnInit {
