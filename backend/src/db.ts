@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Open database connection
-const dbPath = path.join(__dirname, '..', 'database.db');
+const dbPath = process.env.DB_PATH || path.join(__dirname, '..', 'database.db');
 const db = new DatabaseConstructor(dbPath);
 
 // Enable Foreign Key support and WAL mode for concurrent execution
