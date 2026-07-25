@@ -4,6 +4,7 @@ import { ListRegistryService } from '../services/list-registry.service';
 import { WebsocketService } from '../services/websocket.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { Item } from '../shared/websocket';
 
 interface ListData {
@@ -16,7 +17,7 @@ interface ListData {
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [RouterModule, CommonModule, FormsModule],
+  imports: [RouterModule, CommonModule, FormsModule, DragDropModule],
   templateUrl: './list.component.html',
 })
 export class ListComponent implements OnInit, OnDestroy {
@@ -213,5 +214,38 @@ export class ListComponent implements OnInit, OnDestroy {
 
   deleteItem(id: string): void {
     this.wsService.deleteItem(id);
+  }
+
+  drop(event: CdkDragDrop<Item[]>): void {
+    if (event.previousIndex === event.currentIndex) {
+      return;
+    }
+
+    const currentActive = this.activeItems();
+    const item = currentActive[event.previousIndex];
+    
+    const items = [...currentActive];
+    items.splice(event.previousIndex, 1);
+    items.splice(event.currentIndex, 0, item);
+
+    let newPosition = 0;
+    if (event.currentIndex === 0) {
+      newPosition = items[1].position - 1.0;
+    } else if (event.currentIndex === items.length - 1) {
+      newPosition = items[items.length - 2].position + 1.0;
+    } else {
+      const prev = items[event.currentIndex - 1];
+      const next = items[event.currentIndex + 1];
+      newPosition = (prev.position + next.position) / 2.0;
+    }
+
+    const updatedItem: Item = {
+      ...item,
+      position: newPosition,
+      updated_at: Date.now(),
+      editor: this.listRegistryService.getNickname() || 'Someone'
+    };
+
+    this.wsService.updateItem(updatedItem);
   }
 }

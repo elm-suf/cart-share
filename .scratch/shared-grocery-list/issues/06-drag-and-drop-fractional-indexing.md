@@ -4,13 +4,13 @@
 
 **Blocked by:** 05 — Real-time Item CRUD & Optimistic UI
 
-**Status:** ready-for-agent
+**Status:** completed
 
-- [ ] Active items list in the React frontend supports manual drag-and-drop sorting (e.g., using a touch-friendly list sorting library or native drag events).
-- [ ] On drag end, the client calculates the dragged item's new position:
+- [x] Active items list in the frontend supports manual drag-and-drop sorting (e.g., using a touch-friendly list sorting library or native drag events).
+- [x] On drag end, the client calculates the dragged item's new position:
   - If dropped between item A and item B: $\frac{\text{position\_A} + \text{position\_B}}{2}$.
   - If dropped at the top: $\text{position\_first} - 1.0$.
   - If dropped at the bottom: $\text{position\_last} + 1.0$.
-- [ ] Client applies the new position locally and emits an update message over the WebSocket.
-- [ ] Server updates the single item's `position` in the SQLite database and broadcasts the change to the room.
-- [ ] Receiving clients apply the updated item position and re-sort their active item lists instantly.
+- [x] Client applies the new position locally and emits an update message over the WebSocket.
+- [x] Server updates the single item's `position` in the SQLite database and broadcasts the change to the room.
+- [x] Receiving clients apply the updated item position and re-sort their active item lists instantly.
