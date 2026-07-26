@@ -2,11 +2,15 @@ import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../services/supabase.service';
+import { HlmButton } from '@spartan-ng/helm/button';
+import { HlmInput } from '@spartan-ng/helm/input';
+import { HlmCardImports } from '@spartan-ng/helm/card';
+import { HlmLabel } from '@spartan-ng/helm/label';
 
 @Component({
   selector: 'app-auth-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HlmButton, HlmInput, ...HlmCardImports, HlmLabel],
   templateUrl: './auth.component.html'
 })
 export class AuthModalComponent {

@@ -1,72 +1,58 @@
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm">
-  <div class="bg-card border border-border w-full max-w-sm rounded-2xl p-6 shadow-lg flex flex-col relative z-10">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold text-foreground">
-        {{ isSignUp() ? 'Create an Account' : 'Welcome Back' }}
+<div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-background/90 backdrop-blur-sm auth-overlay">
+  <div hlmCard class="w-full max-w-sm rounded-none brutalist-card bg-foreground text-background">
+    <div hlmCardHeader class="relative pb-6 border-b-2 border-background/20 mb-4">
+      <h2 hlmCardTitle class="text-3xl font-bold uppercase text-background tracking-tight">
+        @if (isSignUp()) {
+          Create Account
+        } @else {
+          Welcome Back
+        }
       </h2>
-      <button (click)="close.emit()" class="text-muted-foreground hover:text-foreground border-none bg-transparent cursor-pointer p-1">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
+      <button class="absolute top-0 right-0 p-2 text-background hover:bg-background hover:text-foreground transition-colors cursor-pointer border-2 border-transparent hover:border-background" (click)="close.emit()" aria-label="Close">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
       </button>
     </div>
+    
+    <div hlmCardContent>
+      <form class="flex flex-col gap-6" (submit)="onSubmit(); $event.preventDefault()">
+        <div class="space-y-3">
+          <label hlmLabel class="font-bold text-background uppercase tracking-widest text-xs" for="email">Email</label>
+          <input hlmInput id="email" type="email" class="w-full bg-background border-2 border-background text-foreground text-lg px-4 py-3 rounded-none outline-none focus:ring-0 focus:border-primary transition-colors placeholder:text-muted-foreground font-bold uppercase" placeholder="YOU@EXAMPLE.COM" [ngModel]="username()" (ngModelChange)="username.set($event)" name="username" required />
+        </div>
+        
+        <div class="space-y-3">
+          <label hlmLabel class="font-bold text-background uppercase tracking-widest text-xs" for="password">Password</label>
+          <input hlmInput id="password" type="password" class="w-full bg-background border-2 border-background text-foreground text-lg px-4 py-3 rounded-none outline-none focus:ring-0 focus:border-primary transition-colors placeholder:text-muted-foreground font-bold uppercase" placeholder="••••••••" [ngModel]="password()" (ngModelChange)="password.set($event)" name="password" required />
+        </div>
 
-    <p class="text-sm text-muted-foreground mb-6 leading-relaxed">
-      {{ isSignUp() ? 'Sign up to sync your grocery lists across all your devices.' : 'Log in to access your saved grocery lists.' }}
-    </p>
-
-    @if (errorMessage()) {
-      <div class="bg-destructive/10 border border-destructive/20 text-destructive text-sm p-3 rounded-xl mb-4">
-        {{ errorMessage() }}
-      </div>
-    }
-
-    <form (submit)="onSubmit(); $event.preventDefault()" class="flex flex-col gap-4">
-      <div>
-        <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Username</label>
-        <input 
-          type="text" 
-          class="w-full bg-background border border-border text-foreground text-base px-4 py-3 rounded-xl outline-none focus:border-primary transition-colors placeholder:text-muted-foreground" 
-          placeholder="e.g. alex" 
-          [ngModel]="username()" 
-          (ngModelChange)="username.set($event)" 
-          name="username"
-          required 
-        />
-      </div>
-
-      <div>
-        <label class="block text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Password</label>
-        <input 
-          type="password" 
-          class="w-full bg-background border border-border text-foreground text-base px-4 py-3 rounded-xl outline-none focus:border-primary transition-colors placeholder:text-muted-foreground" 
-          placeholder="••••••••" 
-          [ngModel]="password()" 
-          (ngModelChange)="password.set($event)" 
-          name="password"
-          required 
-        />
-      </div>
-
-      <button 
-        type="submit" 
-        [disabled]="loading()"
-        class="w-full bg-primary text-primary-foreground border-none py-3.5 rounded-xl font-semibold text-base cursor-pointer hover:-translate-y-px shadow-sm transition-transform disabled:opacity-50 mt-2 flex items-center justify-center gap-2"
-      >
-        @if (loading()) {
-          <div class="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
-        } @else {
-          {{ isSignUp() ? 'Sign Up' : 'Log In' }}
+        @if (errorMessage()) {
+          <div class="text-background bg-destructive p-3 font-mono font-bold text-sm uppercase brutalist-border">
+            {{ errorMessage() }}
+          </div>
         }
-      </button>
-    </form>
 
-    <div class="mt-6 text-center text-sm text-muted-foreground">
-      <span>{{ isSignUp() ? 'Already have an account?' : "Don't have an account?" }}</span>
-      <button (click)="toggleMode()" class="text-primary font-semibold border-none bg-transparent cursor-pointer ml-1 hover:underline">
-        {{ isSignUp() ? 'Log In' : 'Sign Up' }}
-      </button>
+        <button hlmBtn type="submit" class="w-full bg-primary text-primary-foreground rounded-none border-2 border-primary font-bold uppercase hover:bg-primary/90 transition-colors flex items-center justify-center py-6 h-auto text-lg mt-2" [disabled]="loading()">
+          @if (loading()) {
+            <div class="w-6 h-6 border-4 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
+          } @else {
+            @if (isSignUp()) {
+              Sign Up
+            } @else {
+              Sign In
+            }
+          }
+        </button>
+
+        <div class="text-center mt-2">
+          <button type="button" class="text-sm font-mono font-bold text-background/80 hover:text-primary transition-colors bg-transparent border-none cursor-pointer underline uppercase" (click)="toggleMode()">
+            @if (isSignUp()) {
+              Already have an account? Sign in
+            } @else {
+              Need an account? Sign up
+            }
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;700&display=swap');
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css';
@@ -7,46 +7,85 @@
 @layer theme, base, components, utilities;
 
 :root {
-  --background: #ECFDF5;
-  --foreground: #0F172A;
-  --primary: #059669;
+  --background: #1D1D1B;
+  --foreground: #FFFFFF;
+  --card: #1D1D1B;
+  --card-foreground: #FFFFFF;
+  --popover: #1D1D1B;
+  --popover-foreground: #FFFFFF;
+  --primary: #E73E22;
   --primary-foreground: #FFFFFF;
-  --secondary: #10B981;
+  --secondary: #3154A1;
   --secondary-foreground: #FFFFFF;
-  --accent: #D97706;
-  --accent-foreground: #FFFFFF;
-  --muted: #F0F8F6;
-  --muted-foreground: #64748B;
-  --border: #E1F2ED;
-  --destructive: #DC2626;
-  --ring: #059669;
-  
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  --radius: 12px;
+  --muted: #27272A;
+  --muted-foreground: #A1A1AA;
+  --accent: #E3E3E3;
+  --accent-foreground: #1D1D1B;
+  --destructive: #E73E22;
+  --destructive-foreground: #FFFFFF;
+  --border: #FFFFFF;
+  --input: #FFFFFF;
+  --ring: #E73E22;
+  --radius: 0px;
+  --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
 }
 
 .dark {
-  --background: #0F172A;
-  --foreground: #F8FAFC;
-  --primary: #059669;
+  --background: #1D1D1B;
+  --foreground: #FFFFFF;
+  --card: #1D1D1B;
+  --card-foreground: #FFFFFF;
+  --popover: #1D1D1B;
+  --popover-foreground: #FFFFFF;
+  --primary: #E73E22;
   --primary-foreground: #FFFFFF;
-  --secondary: #10B981;
+  --secondary: #3154A1;
   --secondary-foreground: #FFFFFF;
-  --accent: #D97706;
-  --accent-foreground: #FFFFFF;
-  --muted: #1E293B;
-  --muted-foreground: #94A3B8;
-  --border: #334155;
-  --destructive: #F87171;
-  --ring: #059669;
+  --muted: #27272A;
+  --muted-foreground: #A1A1AA;
+  --accent: #E3E3E3;
+  --accent-foreground: #1D1D1B;
+  --destructive: #E73E22;
+  --destructive-foreground: #FFFFFF;
+  --border: #FFFFFF;
+  --input: #FFFFFF;
+  --ring: #E73E22;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
   body {
     @apply bg-background text-foreground font-sans min-h-screen flex flex-col items-center p-0 m-0 antialiased;
+  }
+  app-root {
+    @apply w-full max-w-[100vw] overflow-x-hidden flex flex-col min-h-screen;
+  }
+}
+
+@layer utilities {
+  .brutalist-border {
+    @apply border-2 border-foreground;
+  }
+  
+  .brutalist-shadow {
+    box-shadow: 4px 4px 0px 0px var(--foreground);
+  }
+  
+  .brutalist-shadow-hover:hover {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px 0px 0px var(--foreground);
+  }
+
+  .brutalist-card {
+    @apply border-2 border-foreground bg-background p-6 transition-all;
+    box-shadow: 4px 4px 0px 0px var(--foreground);
   }
 }
 
@@ -69,9 +108,8 @@
   }
   .app-container {
     min-height: calc(100vh - 4rem);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border: 2px solid var(--border);
+    box-shadow: 8px 8px 0px 0px var(--border);
     overflow: hidden;
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 }

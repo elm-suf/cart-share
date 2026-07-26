@@ -1,119 +1,130 @@
-<div class="flex-1 flex flex-col justify-between p-6 overflow-y-auto max-w-lg mx-auto w-full">
+<div class="flex-1 flex flex-col justify-between p-6 overflow-y-auto max-w-2xl mx-auto w-full">
   <!-- Top User Navigation / Auth Bar -->
   <div class="flex items-center justify-end z-20 py-2">
     @if (supabaseService.currentUser()) {
-      <div class="flex items-center gap-3 bg-card border border-border px-3.5 py-1.5 rounded-full shadow-sm">
-        <span class="text-xs font-semibold text-foreground truncate max-w-[160px]">
+      <div class="flex items-center gap-3 brutalist-card py-2 px-4 rounded-none !p-2">
+        <span class="text-xs font-bold text-foreground truncate max-w-[160px] uppercase">
           {{ supabaseService.currentUser()?.user_metadata?.['username'] || supabaseService.currentUser()?.email }}
         </span>
-        <button (click)="onLogout()" class="text-xs text-destructive hover:underline font-medium border-none bg-transparent cursor-pointer p-0">
+        <button (click)="onLogout()" hlmBtn variant="destructive" size="sm" class="brutalist-border rounded-none h-8 px-3 text-xs brutalist-shadow-hover font-bold uppercase">
           Logout
         </button>
       </div>
     } @else {
-      <button (click)="showAuthModal.set(true)" class="bg-card text-foreground border border-border text-xs font-semibold px-4 py-2 rounded-full shadow-sm hover:border-muted-foreground hover:bg-muted/30 transition-all cursor-pointer">
+      <button (click)="showAuthModal.set(true)" hlmBtn variant="default" class="brutalist-border brutalist-shadow-hover rounded-none font-bold uppercase tracking-wider bg-secondary text-secondary-foreground hover:bg-secondary/90">
         Log In / Sign Up
       </button>
     }
   </div>
 
   <!-- Brand Header -->
-  <header class="text-center mt-4 relative z-10">
-    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground mb-6 shadow-sm">
-      <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <header class="text-center mt-8 relative z-10">
+    <div class="inline-flex items-center justify-center w-20 h-20 bg-primary text-primary-foreground mb-6 brutalist-border brutalist-shadow">
+      <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="square" stroke-linejoin="miter">
         <circle cx="9" cy="21" r="1"></circle>
         <circle cx="20" cy="21" r="1"></circle>
         <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
       </svg>
     </div>
-    <h1 class="text-4xl font-bold tracking-tight text-foreground mb-2">CartShare</h1>
-    <p class="text-base text-muted-foreground max-w-[300px] mx-auto leading-relaxed">
-      Coordinate grocery runs with partners &amp; roommates — instantly.
+    <h1 class="text-5xl md:text-7xl font-bold uppercase tracking-tighter text-foreground mb-4">CartShare<span class="text-primary">.</span></h1>
+    <p class="text-lg md:text-xl max-w-[400px] mx-auto leading-relaxed font-mono font-bold bg-accent text-accent-foreground p-2 brutalist-border">
+      Coordinate grocery runs with partners & roommates — instantly.
     </p>
   </header>
 
   @if (supabaseService.currentUser() ? lists().length > 0 : localLists().length > 0) {
     <!-- Dashboard Section -->
-    <main class="relative z-10 my-8 dashboard-section">
-      <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
-        <h2 class="text-lg font-semibold text-foreground mb-4">Your Lists</h2>
-        <ul class="flex flex-col gap-3">
-          @if (supabaseService.currentUser()) {
-            @for (list of lists(); track list.id) {
-              <li class="cursor-pointer">
-                <a [href]="'/list/' + list.share_token" class="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-xl hover:bg-muted/80 transition-colors">
-                  <span class="font-medium text-foreground">{{ list.name }}</span>
-                  @if (list.user_id !== supabaseService.currentUser()?.id) {
-                    <span class="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full">Shared</span>
-                  }
-                </a>
-              </li>
+    <main class="relative z-10 my-12 dashboard-section">
+      <div hlmCard class="brutalist-card rounded-none">
+        <div hlmCardHeader>
+          <h2 hlmCardTitle class="text-2xl font-bold uppercase tracking-tight">Your Lists</h2>
+        </div>
+        <div hlmCardContent>
+          <ul class="flex flex-col gap-4 mt-4">
+            @if (supabaseService.currentUser()) {
+              @for (list of lists(); track list.id) {
+                <li>
+                  <a [href]="'/list/' + list.share_token" class="flex items-center justify-between p-4 bg-background brutalist-border brutalist-shadow-hover hover:bg-accent hover:text-accent-foreground transition-colors group">
+                    <span class="font-bold text-xl uppercase truncate group-hover:text-accent-foreground">{{ list.name }}</span>
+                    @if (list.user_id !== supabaseService.currentUser()?.id) {
+                      <span class="text-xs font-bold text-primary border-2 border-primary px-2 py-1 uppercase bg-primary/10">Shared</span>
+                    }
+                  </a>
+                </li>
+              }
+            } @else {
+              @for (list of localLists(); track list.shareToken) {
+                <li>
+                  <a [href]="'/list/' + list.shareToken" class="flex items-center justify-between p-4 bg-background brutalist-border brutalist-shadow-hover hover:bg-accent hover:text-accent-foreground transition-colors group">
+                    <span class="font-bold text-xl uppercase truncate group-hover:text-accent-foreground">{{ list.name }}</span>
+                    <span class="text-xs font-bold text-secondary border-2 border-secondary px-2 py-1 uppercase bg-secondary/10" *ngIf="list.isCreator">Creator</span>
+                  </a>
+                </li>
+              }
             }
-          } @else {
-            @for (list of localLists(); track list.shareToken) {
-              <li class="cursor-pointer">
-                <a [href]="'/list/' + list.shareToken" class="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-xl hover:bg-muted/80 transition-colors">
-                  <span class="font-medium text-foreground">{{ list.name }}</span>
-                  <span class="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full" *ngIf="list.isCreator">Creator</span>
-                </a>
-              </li>
-            }
-          }
-        </ul>
+          </ul>
+        </div>
       </div>
     </main>
   } @else {
     <!-- Feature Card -->
-    <main class="relative z-10 my-8 intro-section">
-      <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
-        <h2 class="text-lg font-semibold text-foreground mb-4">Why CartShare?</h2>
-        <ul class="flex flex-col gap-3">
-          <li class="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
-            <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-            <span><strong class="text-foreground font-semibold">Real-time sync</strong> — powered by Supabase Realtime Postgres.</span>
-          </li>
-          <li class="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
-            <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-            <span><strong class="text-foreground font-semibold">Cloud Account &amp; Guest Sharing</strong> — save lists permanently or share instantly via link.</span>
-          </li>
-          <li class="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
-            <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-            <span><strong class="text-foreground font-semibold">Serverless</strong> — hosted on Vercel with zero server overhead.</span>
-          </li>
-        </ul>
+    <main class="relative z-10 my-12 intro-section">
+      <div hlmCard class="brutalist-card rounded-none bg-secondary text-secondary-foreground">
+        <div hlmCardHeader>
+          <h2 hlmCardTitle class="text-2xl md:text-3xl font-bold uppercase tracking-tight">Why CartShare?</h2>
+        </div>
+        <div hlmCardContent>
+          <ul class="flex flex-col gap-5 mt-4">
+            <li class="flex items-start gap-4 text-base font-mono font-bold leading-relaxed">
+              <span class="text-primary text-2xl leading-none">✱</span>
+              <span>Real-time sync — powered by Supabase Realtime Postgres.</span>
+            </li>
+            <li class="flex items-start gap-4 text-base font-mono font-bold leading-relaxed">
+              <span class="text-primary text-2xl leading-none">✱</span>
+              <span>Cloud Account & Guest Sharing — save lists permanently or share instantly via link.</span>
+            </li>
+            <li class="flex items-start gap-4 text-base font-mono font-bold leading-relaxed">
+              <span class="text-primary text-2xl leading-none">✱</span>
+              <span>Serverless — hosted on Vercel with zero server overhead.</span>
+            </li>
+          </ul>
+        </div>
       </div>
     </main>
   }
 
   <!-- Action Footer -->
-  <footer class="relative z-10 flex flex-col items-center gap-4 my-4">
-    <button id="create-list-btn" hlmBtn class="w-full py-4 rounded-xl border-0 bg-primary text-primary-foreground text-lg font-semibold cursor-pointer shadow-sm hover:-translate-y-0.5 hover:shadow-md active:translate-y-px transition-all flex items-center justify-center gap-2" (click)="onCreateList()">
+  <footer class="relative z-10 flex flex-col items-center gap-6 my-8">
+    <button id="create-list-btn" hlmBtn class="w-full py-8 h-auto rounded-none border-4 border-foreground bg-primary text-primary-foreground text-2xl font-bold uppercase tracking-wider brutalist-shadow-hover hover:bg-primary/90 flex items-center justify-center gap-4" (click)="onCreateList()">
       Create a Grocery List
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter">
         <line x1="5" y1="12" x2="19" y2="12"></line>
         <polyline points="12 5 19 12 12 19"></polyline>
       </svg>
     </button>
-    <p class="text-xs text-muted-foreground">Built for modern household coordination</p>
   </footer>
 
   <!-- Create Prompt Overlay -->
   @if (showCreatePrompt()) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm nickname-overlay">
-      <div class="bg-card border border-border w-full max-w-sm rounded-2xl p-6 shadow-lg flex flex-col">
-        <h2 class="text-xl font-bold text-foreground mb-2">Name your list</h2>
-        <p class="text-sm text-muted-foreground mb-6 leading-relaxed">Give your new grocery list a name (optional).</p>
-        <div class="flex flex-col gap-4">
-          <input type="text" class="w-full bg-background border border-border text-foreground text-base px-4 py-3 rounded-xl outline-none focus:border-primary transition-colors placeholder:text-muted-foreground" placeholder="e.g., Weekend Groceries" [ngModel]="newListNameInput()" (ngModelChange)="newListNameInput.set($event)" (keyup.enter)="submitCreateList()" />
-          <div class="flex gap-3">
-            <button class="flex-1 bg-muted/50 text-foreground border border-border py-3 rounded-xl font-semibold cursor-pointer hover:bg-muted transition-colors" (click)="cancelCreateList()">Cancel</button>
-            <button class="flex-1 bg-primary text-primary-foreground border-none py-3 rounded-xl font-semibold cursor-pointer hover:-translate-y-px shadow-sm transition-transform disabled:opacity-50 flex items-center justify-center" (click)="submitCreateList()" [disabled]="loading()">
-              @if (loading()) {
-                <div class="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
-              } @else {
-                Create
-              }
-            </button>
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/90 backdrop-blur-sm nickname-overlay">
+      <div hlmCard class="w-full max-w-sm rounded-none brutalist-card bg-foreground text-background">
+        <div hlmCardHeader>
+          <h2 hlmCardTitle class="text-2xl font-bold uppercase text-background">Name your list</h2>
+          <p hlmCardDescription class="text-sm font-mono font-bold text-background/80 mt-2">Give your new grocery list a name (optional).</p>
+        </div>
+        <div hlmCardContent>
+          <div class="flex flex-col gap-6 mt-4">
+            <input hlmInput type="text" class="w-full bg-background border-2 border-background text-foreground text-lg px-4 py-3 rounded-none outline-none focus:ring-0 focus:border-primary transition-colors placeholder:text-muted-foreground font-bold uppercase" placeholder="e.g., WEEKEND GROCERIES" [ngModel]="newListNameInput()" (ngModelChange)="newListNameInput.set($event)" (keyup.enter)="submitCreateList()" />
+            <div class="flex gap-4">
+              <button hlmBtn variant="outline" class="flex-1 rounded-none font-bold uppercase border-2 border-background text-background bg-transparent hover:bg-background hover:text-foreground transition-colors" (click)="cancelCreateList()">Cancel</button>
+              <button hlmBtn class="flex-1 bg-primary text-primary-foreground rounded-none border-2 border-primary font-bold uppercase hover:bg-primary/90 transition-colors flex items-center justify-center" (click)="submitCreateList()" [disabled]="loading()">
+                @if (loading()) {
+                  <div class="w-6 h-6 border-4 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
+                } @else {
+                  Create
+                }
+              </button>
+            </div>
           </div>
         </div>
       </div>
