@@ -2,11 +2,15 @@ import { Component, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseService } from '../services/supabase.service';
+import { HlmInputImports } from '../ui/input/src';
+import { HlmLabelImports } from '../ui/label/src';
+import { HlmSpinnerImports } from '../ui/spinner/src';
+import { HlmButtonImports } from '../ui/button/src';
 
 @Component({
   selector: 'app-auth-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ...HlmInputImports, ...HlmLabelImports, ...HlmSpinnerImports, ...HlmButtonImports],
   templateUrl: './auth.component.html'
 })
 export class AuthModalComponent {
@@ -23,6 +27,10 @@ export class AuthModalComponent {
   toggleMode(): void {
     this.isSignUp.update(val => !val);
     this.errorMessage.set('');
+  }
+
+  onBackdropClick(event: MouseEvent): void {
+    this.close.emit();
   }
 
   async onSubmit(): Promise<void> {

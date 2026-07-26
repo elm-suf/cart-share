@@ -5,11 +5,25 @@ import { FormsModule } from '@angular/forms';
 import { SupabaseService, GroceryList } from '../services/supabase.service';
 import { AuthModalComponent } from '../auth/auth.component';
 import { ListRegistryService, ListRegistryEntry } from '../services/list-registry.service';
+import { HlmButtonImports } from '../ui/button/src';
+import { HlmBadgeImports } from '../ui/badge/src';
+import { HlmInputImports } from '../ui/input/src';
+import { HlmSpinnerImports } from '../ui/spinner/src';
+import { ThemeToggleComponent } from '../ui/theme-toggle.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, FormsModule, AuthModalComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    AuthModalComponent,
+    ThemeToggleComponent,
+    ...HlmButtonImports,
+    ...HlmBadgeImports,
+    ...HlmInputImports,
+    ...HlmSpinnerImports,
+  ],
   templateUrl: './landing.component.html',
 })
 export class LandingComponent implements OnInit {
@@ -19,7 +33,7 @@ export class LandingComponent implements OnInit {
 
   lists = signal<GroceryList[]>([]);
   localLists = signal<ListRegistryEntry[]>([]);
-  
+
   showCreatePrompt = signal<boolean>(false);
   showAuthModal = signal<boolean>(false);
   newListNameInput = signal<string>('');

@@ -1,115 +1,213 @@
-<div class="flex-1 flex flex-col justify-between p-6 overflow-y-auto max-w-lg mx-auto w-full">
-  <!-- Top User Navigation / Auth Bar -->
-  <div class="flex items-center justify-end z-20 py-2">
-    @if (supabaseService.currentUser()) {
-      <div class="flex items-center gap-3 bg-card border border-border px-3.5 py-1.5 rounded-full shadow-sm">
-        <span class="text-xs font-semibold text-foreground truncate max-w-[160px]">
+<div class="flex-1 flex flex-col p-5 overflow-y-auto">
+
+  <!-- Top Nav Bar -->
+  <nav class="flex items-center justify-between py-2 mb-1">
+    <!-- Brand mark -->
+    <div class="flex items-center gap-2">
+      <div class="size-7 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
+        <svg class="size-4 text-primary-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"></circle>
+          <circle cx="20" cy="21" r="1"></circle>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+        </svg>
+      </div>
+      <span class="text-sm font-semibold text-foreground tracking-tight">CartShare</span>
+    </div>
+
+    <!-- Auth pill -->
+    <div class="flex items-center gap-2">
+      <app-theme-toggle></app-theme-toggle>
+      @if (supabaseService.currentUser()) {
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-medium text-muted-foreground hidden sm:block truncate max-w-[120px]">
           {{ supabaseService.currentUser()?.user_metadata?.['username'] || supabaseService.currentUser()?.email }}
         </span>
-        <button (click)="onLogout()" class="text-xs text-destructive hover:underline font-medium border-none bg-transparent cursor-pointer p-0">
-          Logout
+        <button
+          (click)="onLogout()"
+          class="text-xs text-muted-foreground hover:text-foreground font-medium border border-border rounded-lg px-3 py-1.5 bg-card hover:bg-muted/60 transition-colors cursor-pointer">
+          Sign out
         </button>
       </div>
     } @else {
-      <button (click)="showAuthModal.set(true)" class="bg-card text-foreground border border-border text-xs font-semibold px-4 py-2 rounded-full shadow-sm hover:border-muted-foreground hover:bg-muted/30 transition-all cursor-pointer">
-        Log In / Sign Up
+      <button
+        (click)="showAuthModal.set(true)"
+        class="text-xs font-medium px-3 py-1.5 rounded-lg border border-border bg-card text-foreground hover:bg-muted/60 transition-colors cursor-pointer">
+        Sign in
       </button>
     }
-  </div>
-
-  <!-- Brand Header -->
-  <header class="text-center mt-4 relative z-10">
-    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary text-primary-foreground mb-6 shadow-sm">
-      <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="9" cy="21" r="1"></circle>
-        <circle cx="20" cy="21" r="1"></circle>
-        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-      </svg>
     </div>
-    <h1 class="text-4xl font-bold tracking-tight text-foreground mb-2">CartShare</h1>
-    <p class="text-base text-muted-foreground max-w-[300px] mx-auto leading-relaxed">
-      Coordinate grocery runs with partners &amp; roommates — instantly.
+  </nav>
+
+  <!-- Hero -->
+  <header class="mt-8 mb-8">
+    <h1 class="text-3xl font-bold tracking-tight text-foreground leading-tight mb-2">
+      Grocery lists,<br />shared instantly.
+    </h1>
+    <p class="text-sm text-muted-foreground leading-relaxed max-w-[280px]">
+      Coordinate shopping with partners &amp; roommates in real-time.
     </p>
   </header>
 
+  <!-- Lists / Features -->
   @if (supabaseService.currentUser() ? lists().length > 0 : localLists().length > 0) {
-    <!-- Dashboard Section -->
-    <main class="relative z-10 my-8 dashboard-section">
-      <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
-        <h2 class="text-lg font-semibold text-foreground mb-4">Your Lists</h2>
-        <ul class="flex flex-col gap-3">
-          @if (supabaseService.currentUser()) {
-            @for (list of lists(); track list.id) {
-              <li class="cursor-pointer">
-                <a [href]="'/list/' + list.share_token" class="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-xl hover:bg-muted/80 transition-colors">
-                  <span class="font-medium text-foreground">{{ list.name }}</span>
+    <section class="flex-1 mb-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Your lists</h2>
+        <span class="text-xs text-muted-foreground">
+          {{ (supabaseService.currentUser() ? lists() : localLists()).length }} list{{ (supabaseService.currentUser() ? lists() : localLists()).length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+      <ul class="flex flex-col gap-1.5">
+        @if (supabaseService.currentUser()) {
+          @for (list of lists(); track list.id) {
+            <li>
+              <a
+                [href]="'/list/' + list.share_token"
+                class="group flex items-center justify-between p-3.5 bg-card border border-border rounded-lg hover:border-foreground/20 hover:bg-muted/40 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="size-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="size-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path>
+                      <rect x="9" y="3" width="6" height="4" rx="1" ry="1"></rect>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-medium text-foreground truncate">{{ list.name }}</span>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0 ml-2">
                   @if (list.user_id !== supabaseService.currentUser()?.id) {
-                    <span class="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full">Shared</span>
+                    <span hlmBadge variant="secondary" class="text-xs">Shared</span>
                   }
-                </a>
-              </li>
-            }
-          } @else {
-            @for (list of localLists(); track list.shareToken) {
-              <li class="cursor-pointer">
-                <a [href]="'/list/' + list.shareToken" class="flex items-center justify-between p-4 bg-muted/30 border border-border rounded-xl hover:bg-muted/80 transition-colors">
-                  <span class="font-medium text-foreground">{{ list.name }}</span>
-                  <span class="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-full" *ngIf="list.isCreator">Creator</span>
-                </a>
-              </li>
-            }
+                  <svg class="size-3.5 text-muted-foreground group-hover:text-foreground transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </a>
+            </li>
           }
-        </ul>
-      </div>
-    </main>
+        } @else {
+          @for (list of localLists(); track list.shareToken) {
+            <li>
+              <a
+                [href]="'/list/' + list.shareToken"
+                class="group flex items-center justify-between p-3.5 bg-card border border-border rounded-lg hover:border-foreground/20 hover:bg-muted/40 transition-all">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="size-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <svg class="size-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path>
+                      <rect x="9" y="3" width="6" height="4" rx="1" ry="1"></rect>
+                    </svg>
+                  </div>
+                  <span class="text-sm font-medium text-foreground truncate">{{ list.name }}</span>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0 ml-2">
+                  <svg class="size-3.5 text-muted-foreground group-hover:text-foreground transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </a>
+            </li>
+          }
+        }
+      </ul>
+    </section>
   } @else {
-    <!-- Feature Card -->
-    <main class="relative z-10 my-8 intro-section">
-      <div class="bg-card border border-border rounded-2xl p-6 shadow-sm">
-        <h2 class="text-lg font-semibold text-foreground mb-4">Why CartShare?</h2>
-        <ul class="flex flex-col gap-3">
-          <li class="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
-            <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-            <span><strong class="text-foreground font-semibold">Real-time sync</strong> — powered by Supabase Realtime Postgres.</span>
-          </li>
-          <li class="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
-            <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-            <span><strong class="text-foreground font-semibold">Cloud Account &amp; Guest Sharing</strong> — save lists permanently or share instantly via link.</span>
-          </li>
-          <li class="flex items-start gap-3 text-sm text-muted-foreground leading-relaxed">
-            <svg class="w-5 h-5 text-primary flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path></svg>
-            <span><strong class="text-foreground font-semibold">Serverless</strong> — hosted on Vercel with zero server overhead.</span>
-          </li>
-        </ul>
+    <!-- Feature list (empty state) -->
+    <section class="flex-1 mb-6">
+      <div class="flex flex-col gap-3">
+        <div class="flex items-start gap-3 p-3.5 bg-card border border-border rounded-lg">
+          <div class="size-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg class="size-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-foreground">Real-time sync</p>
+            <p class="text-xs text-muted-foreground mt-0.5 leading-relaxed">Powered by Supabase Realtime — updates appear instantly for everyone.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-3.5 bg-card border border-border rounded-lg">
+          <div class="size-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg class="size-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-foreground">Share via link</p>
+            <p class="text-xs text-muted-foreground mt-0.5 leading-relaxed">Share a list instantly — no account needed for collaborators.</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3 p-3.5 bg-card border border-border rounded-lg">
+          <div class="size-8 rounded-md bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+            <svg class="size-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-foreground">Simple &amp; fast</p>
+            <p class="text-xs text-muted-foreground mt-0.5 leading-relaxed">Zero friction — create a list in seconds, start adding items right away.</p>
+          </div>
+        </div>
       </div>
-    </main>
+    </section>
   }
 
-  <!-- Action Footer -->
-  <footer class="relative z-10 flex flex-col items-center gap-4 my-4">
-    <button id="create-list-btn" hlmBtn class="w-full py-4 rounded-xl border-0 bg-primary text-primary-foreground text-lg font-semibold cursor-pointer shadow-sm hover:-translate-y-0.5 hover:shadow-md active:translate-y-px transition-all flex items-center justify-center gap-2" (click)="onCreateList()">
-      Create a Grocery List
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+  <!-- CTA Footer -->
+  <footer class="mt-auto pt-2 pb-2">
+    <button
+      id="create-list-btn"
+      hlmBtn
+      class="w-full h-11 text-sm font-semibold gap-2"
+      (click)="onCreateList()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"></line>
         <line x1="5" y1="12" x2="19" y2="12"></line>
-        <polyline points="12 5 19 12 12 19"></polyline>
       </svg>
+      New grocery list
     </button>
-    <p class="text-xs text-muted-foreground">Built for modern household coordination</p>
+    <p class="text-center text-xs text-muted-foreground mt-3">Built for modern household coordination</p>
   </footer>
 
-  <!-- Create Prompt Overlay -->
+  <!-- Create List Modal -->
   @if (showCreatePrompt()) {
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm nickname-overlay">
-      <div class="bg-card border border-border w-full max-w-sm rounded-2xl p-6 shadow-lg flex flex-col">
-        <h2 class="text-xl font-bold text-foreground mb-2">Name your list</h2>
-        <p class="text-sm text-muted-foreground mb-6 leading-relaxed">Give your new grocery list a name (optional).</p>
-        <div class="flex flex-col gap-4">
-          <input type="text" class="w-full bg-background border border-border text-foreground text-base px-4 py-3 rounded-xl outline-none focus:border-primary transition-colors placeholder:text-muted-foreground" placeholder="e.g., Weekend Groceries" [ngModel]="newListNameInput()" (ngModelChange)="newListNameInput.set($event)" (keyup.enter)="submitCreateList()" />
-          <div class="flex gap-3">
-            <button class="flex-1 bg-muted/50 text-foreground border border-border py-3 rounded-xl font-semibold cursor-pointer hover:bg-muted transition-colors" (click)="cancelCreateList()">Cancel</button>
-            <button class="flex-1 bg-primary text-primary-foreground border-none py-3 rounded-xl font-semibold cursor-pointer hover:-translate-y-px shadow-sm transition-transform disabled:opacity-50 flex items-center justify-center" (click)="submitCreateList()" [disabled]="loading()">
+    <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm"
+         (click)="cancelCreateList()">
+      <div class="bg-card w-full sm:max-w-sm rounded-t-2xl sm:rounded-xl border border-border shadow-xl flex flex-col"
+           (click)="$event.stopPropagation()">
+        <div class="flex items-center justify-between p-5 pb-0">
+          <div>
+            <h2 class="text-base font-semibold text-foreground tracking-tight">Name your list</h2>
+            <p class="text-xs text-muted-foreground mt-0.5">Give your new grocery list a name (optional).</p>
+          </div>
+          <button
+            (click)="cancelCreateList()"
+            class="size-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer border-none bg-transparent"
+            aria-label="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="h-px bg-border mx-5 mt-4"></div>
+        <div class="flex flex-col gap-4 p-5">
+          <input
+            hlmInput
+            id="list-name-input"
+            type="text"
+            placeholder="e.g., Weekend Groceries"
+            [ngModel]="newListNameInput()"
+            (ngModelChange)="newListNameInput.set($event)"
+            (keyup.enter)="submitCreateList()"
+            class="h-9 text-sm"
+            autofocus
+          />
+          <div class="flex gap-2">
+            <button hlmBtn variant="outline" class="flex-1 h-9 text-sm" (click)="cancelCreateList()">Cancel</button>
+            <button hlmBtn class="flex-1 h-9 text-sm gap-2" (click)="submitCreateList()" [disabled]="loading()">
               @if (loading()) {
-                <div class="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
+                <hlm-spinner />
               } @else {
                 Create
               }

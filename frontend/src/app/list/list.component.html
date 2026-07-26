@@ -1,164 +1,273 @@
-<div class="flex-1 flex flex-col p-6 overflow-y-auto">
+<div class="flex-1 flex flex-col overflow-y-auto">
   @if (loading()) {
-    <div class="flex-1 flex flex-col items-center justify-center text-center p-8 z-10">
-      <div class="w-12 h-12 border-4 border-border border-t-primary rounded-full animate-spin mb-5"></div>
-      <p class="text-sm text-muted-foreground font-medium">Loading grocery list...</p>
+    <div class="flex-1 flex flex-col items-center justify-center text-center p-8">
+      <hlm-spinner class="mb-4" />
+      <p class="text-sm text-muted-foreground">Loading your list...</p>
     </div>
   } @else if (errorMessage()) {
-    <div class="flex-1 flex flex-col items-center justify-center text-center p-8 z-10">
-      <div class="text-destructive mb-4">
-        <svg class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <div class="flex-1 flex flex-col items-center justify-center text-center p-8">
+      <div class="size-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+        <svg class="size-6 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
         </svg>
       </div>
-      <h2 class="text-xl font-bold text-foreground mb-2">Unable to Load List</h2>
-      <p class="text-sm text-muted-foreground mb-6 max-w-[280px]">{{ errorMessage() }}</p>
-      <a routerLink="/" class="inline-flex items-center justify-center bg-card text-foreground border border-border px-6 py-3 rounded-xl text-sm font-semibold hover:border-muted-foreground hover:bg-muted/30 transition-colors">Go to Dashboard</a>
+      <h2 class="text-base font-semibold text-foreground mb-1">Unable to load list</h2>
+      <p class="text-sm text-muted-foreground mb-5 max-w-[260px] leading-relaxed">{{ errorMessage() }}</p>
+      <a routerLink="/" hlmBtn variant="outline" class="text-sm">Go home</a>
     </div>
   } @else if (listData()) {
-    <header class="relative z-10 mb-6">
-      <div class="flex items-center justify-between mb-4 gap-2">
-        <a routerLink="/" class="text-muted-foreground inline-flex items-center justify-center w-10 h-10 rounded-xl bg-card border border-border hover:text-foreground hover:border-muted-foreground transition-colors flex-shrink-0">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="19" y1="12" x2="5" y2="12"></line>
-            <polyline points="12 19 5 12 12 5"></polyline>
-          </svg>
-        </a>
-        <div class="flex-1 min-w-0 flex justify-center">
-          @if (isEditingName()) {
-            <form class="flex-1 max-w-[300px]" (submit)="saveListName(); $event.preventDefault()">
-              <input type="text" class="w-full bg-card border border-border text-foreground text-center font-bold text-xl sm:text-2xl px-2 py-1 rounded-lg outline-none focus:border-primary transition-colors" [ngModel]="editNameInput()" (ngModelChange)="editNameInput.set($event)" name="editName" (blur)="saveListName()" autofocus />
-            </form>
-          } @else {
-            <h1 class="text-xl sm:text-2xl font-bold text-center truncate text-foreground flex items-center gap-2 group">
-              <span class="truncate">{{ listData()?.name }}</span>
-              @if (isCreator()) {
-                <button class="transition-colors bg-transparent border-none cursor-pointer text-muted-foreground hover:text-foreground flex-shrink-0" (click)="startEditingName()" aria-label="Edit list name">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                </button>
-              }
-            </h1>
-          }
-        </div>
-        <div class="flex flex-shrink-0 items-center gap-2">
-          @if (isCreator()) {
-            <button class="bg-card text-foreground border border-border font-semibold text-sm px-3 sm:px-4 py-2 rounded-xl cursor-pointer shadow-sm hover:border-muted-foreground hover:bg-muted/30 transition-all flex-shrink-0 flex items-center justify-center gap-2 disabled:opacity-50" (click)="rotateLink()" [disabled]="isRotating()" title="Rotate Share Link">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" [class.animate-spin]="isRotating()"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
-              <span class="hidden sm:inline">Rotate Link</span>
-            </button>
-          }
-          <button class="bg-primary text-primary-foreground border-none font-semibold text-sm px-3 sm:px-4 py-2 rounded-xl cursor-pointer shadow-sm hover:-translate-y-px transition-transform flex-shrink-0 flex items-center justify-center gap-2" (click)="copyLink()">
-            @if (linkCopied()) {
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-              <span class="hidden sm:inline">Copied!</span>
-            } @else {
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              <span class="hidden sm:inline">Share</span>
+
+    <!-- Header -->
+    <header class="flex items-center gap-2 p-4 pb-3 border-b border-border">
+      <a routerLink="/"
+         class="size-8 flex items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors flex-shrink-0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+      </a>
+
+      <div class="flex-1 min-w-0 flex justify-center">
+        @if (isEditingName()) {
+          <form class="flex-1 max-w-[260px]" (submit)="saveListName(); $event.preventDefault()">
+            <input
+              hlmInput
+              type="text"
+              class="text-center font-semibold text-sm h-8"
+              [ngModel]="editNameInput()"
+              (ngModelChange)="editNameInput.set($event)"
+              name="editName"
+              (blur)="saveListName()"
+              autofocus
+            />
+          </form>
+        } @else {
+          <div class="flex items-center gap-1.5 min-w-0">
+            <h1 class="text-sm font-semibold text-foreground truncate">{{ listData()?.name }}</h1>
+            @if (isCreator()) {
+              <button
+                class="text-muted-foreground hover:text-foreground bg-transparent border-none cursor-pointer p-0.5 rounded flex-shrink-0 transition-colors"
+                (click)="startEditingName()"
+                aria-label="Edit list name">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                </svg>
+              </button>
             }
-          </button>
-        </div>
+          </div>
+        }
       </div>
 
+      <!-- Action buttons -->
+      <div class="flex items-center gap-1.5 flex-shrink-0">
+        <app-theme-toggle></app-theme-toggle>
+        @if (isCreator()) {
+          <button
+            hlmBtn
+            variant="ghost"
+            size="icon-sm"
+            (click)="rotateLink()"
+            [disabled]="isRotating()"
+            title="Rotate share link"
+            class="size-8">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" [class.animate-spin]="isRotating()">
+              <path d="M21 2v6h-6"></path>
+              <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
+              <path d="M3 22v-6h6"></path>
+              <path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path>
+            </svg>
+          </button>
+        }
+        <button
+          hlmBtn
+          size="sm"
+          class="h-8 text-xs gap-1.5 px-3"
+          (click)="copyLink()">
+          @if (linkCopied()) {
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            Copied
+          } @else {
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Share
+          }
+        </button>
+      </div>
     </header>
 
-    <main class="flex-1 flex flex-col relative z-10">
-      <form class="flex items-center gap-2 bg-card border border-border p-2 sm:p-3 rounded-2xl shadow-sm mb-6" (submit)="addNewItem(); $event.preventDefault()">
-        <input type="text" class="flex-1 min-w-0 bg-transparent border-none text-foreground text-sm sm:text-base px-2 py-1 outline-none placeholder:text-muted-foreground" placeholder="Add an item (e.g. Milk)" [ngModel]="newItemName()" (ngModelChange)="newItemName.set($event)" name="itemName" autocomplete="off" />
-        <input type="text" class="w-16 sm:w-24 flex-shrink-0 bg-transparent border-l border-border text-foreground text-sm sm:text-base px-2 sm:px-3 py-1 outline-none placeholder:text-muted-foreground" placeholder="Qty" [ngModel]="newItemQuantity()" (ngModelChange)="newItemQuantity.set($event)" name="itemQty" autocomplete="off" />
-        <button type="submit" class="bg-primary text-primary-foreground border-none w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer shadow-sm hover:-translate-y-px transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0" [disabled]="!newItemName().trim()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    <!-- Add Item Form -->
+    <div class="px-4 pt-4 pb-3">
+      <form
+        class="flex items-center gap-2 bg-card border border-border rounded-lg px-3 py-2 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all"
+        (submit)="addNewItem(); $event.preventDefault()">
+        <input
+          type="text"
+          class="flex-1 min-w-0 bg-transparent border-none text-sm text-foreground outline-none placeholder:text-muted-foreground"
+          placeholder="Add an item…"
+          [ngModel]="newItemName()"
+          (ngModelChange)="newItemName.set($event)"
+          name="itemName"
+          autocomplete="off"
+        />
+        <div class="h-4 w-px bg-border flex-shrink-0"></div>
+        <input
+          type="text"
+          class="w-14 flex-shrink-0 bg-transparent border-none text-sm text-foreground outline-none placeholder:text-muted-foreground text-right"
+          placeholder="Qty"
+          [ngModel]="newItemQuantity()"
+          (ngModelChange)="newItemQuantity.set($event)"
+          name="itemQty"
+          autocomplete="off"
+        />
+        <button
+          type="submit"
+          class="size-7 rounded-md bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 cursor-pointer border-none hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+          [disabled]="!newItemName().trim()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
         </button>
       </form>
+    </div>
 
+    <!-- Items List -->
+    <main class="flex-1 px-4 pb-6 overflow-y-auto">
       @if (items().length === 0) {
-        <div class="flex-1 flex flex-col items-center justify-center text-center p-10">
-          <div class="text-muted-foreground/50 mb-4">
-            <svg class="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <div class="flex flex-col items-center justify-center text-center py-16">
+          <div class="size-12 rounded-full bg-muted flex items-center justify-center mb-3">
+            <svg class="size-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
             </svg>
           </div>
-          <h3 class="text-lg font-semibold text-foreground mb-2">Your list is empty</h3>
-          <p class="text-sm text-muted-foreground max-w-[250px] leading-relaxed">Items added here sync in real-time with other shoppers.</p>
+          <h3 class="text-sm font-medium text-foreground mb-1">List is empty</h3>
+          <p class="text-xs text-muted-foreground">Add items above — they sync in real-time.</p>
         </div>
       } @else {
-        <div class="flex flex-col gap-6 items-start">
-          <div class="flex-1 w-full">
-            @if (activeItems().length > 0) {
-              <ul class="flex flex-col gap-2" cdkDropList (cdkDropListDropped)="drop($event)">
-                @for (item of activeItems(); track item.id) {
-                  <li cdkDrag class="flex items-center gap-3 bg-card border border-border rounded-xl p-3 shadow-sm hover:border-primary/50 transition-colors cursor-grab active:cursor-grabbing">
-                    <button class="w-6 h-6 flex-shrink-0 rounded border-2 border-primary flex items-center justify-center cursor-pointer bg-transparent transition-colors hover:bg-primary/10" (click)="toggleItem(item)" aria-label="Check item"></button>
-                    <div class="flex-1 flex flex-col min-w-0">
-                      <div class="flex items-baseline gap-2">
-                        <span class="font-medium text-foreground text-base truncate">{{ item.name }}</span>
-                        @if (item.quantity) {
-                          <span class="text-sm text-primary font-medium bg-primary/10 px-2 py-0.5 rounded-full flex-shrink-0">{{ item.quantity }}</span>
-                        }
-                      </div>
-                      <div class="text-xs text-muted-foreground mt-0.5 truncate">Added by {{ item.editor || 'Someone' }}</div>
-                    </div>
-                    <button class="w-8 h-8 flex-shrink-0 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer border-none bg-transparent" (click)="deleteItem(item.id)" aria-label="Delete item">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                  </li>
-                }
-              </ul>
-            }
-          </div>
+        <div class="flex flex-col gap-5">
 
-          @if (checkedItems().length > 0) {
-            <div class="w-full flex-shrink-0 flex flex-col gap-3">
-              <h3 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider pl-1">Checked Items</h3>
-              <ul class="flex flex-col gap-2 opacity-70">
-                @for (item of checkedItems(); track item.id) {
-                  <li class="flex items-center gap-3 bg-muted/50 border border-border rounded-xl p-3">
-                    <button class="w-6 h-6 flex-shrink-0 rounded border-2 border-primary bg-primary text-primary-foreground flex items-center justify-center cursor-pointer transition-colors" (click)="toggleItem(item)" aria-label="Uncheck item">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <!-- Active Items -->
+          @if (activeItems().length > 0) {
+            <ul class="flex flex-col gap-1" cdkDropList (cdkDropListDropped)="drop($event)">
+              @for (item of activeItems(); track item.id) {
+                <li
+                  cdkDrag
+                  class="group flex items-center gap-3 p-3 bg-card border border-border rounded-lg hover:border-foreground/15 transition-colors cursor-grab active:cursor-grabbing active:shadow-md active:scale-[1.01] active:z-10">
+                  <button
+                    class="size-4 flex-shrink-0 rounded border-2 border-border hover:border-primary transition-colors bg-transparent cursor-pointer"
+                    (click)="toggleItem(item)"
+                    aria-label="Mark as done">
+                  </button>
+                  <div class="flex-1 flex items-center gap-2 min-w-0">
+                    <span class="text-sm font-medium text-foreground truncate">{{ item.name }}</span>
+                    @if (item.quantity) {
+                      <span class="text-xs text-muted-foreground bg-muted px-1.5 py-0.5 rounded font-medium flex-shrink-0">{{ item.quantity }}</span>
+                    }
+                  </div>
+                  <div class="flex items-center gap-1 flex-shrink-0">
+                    <span class="text-xs text-muted-foreground hidden group-hover:block">{{ item.editor || 'Someone' }}</span>
+                    <button
+                      class="size-7 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors cursor-pointer border-none bg-transparent opacity-0 group-hover:opacity-100"
+                      (click)="deleteItem(item.id)"
+                      aria-label="Delete item">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
                     </button>
-                    <div class="flex-1 flex flex-col min-w-0">
-                      <div class="flex items-baseline gap-2">
-                        <span class="font-medium text-muted-foreground text-base line-through truncate">{{ item.name }}</span>
-                        @if (item.quantity) {
-                          <span class="text-sm text-muted-foreground font-medium px-2 py-0.5 rounded-full bg-border line-through flex-shrink-0">{{ item.quantity }}</span>
-                        }
-                      </div>
-                      <div class="text-xs text-muted-foreground mt-0.5 truncate">Checked by {{ item.editor || 'Someone' }}</div>
+                  </div>
+                </li>
+              }
+            </ul>
+          }
+
+          <!-- Checked Items -->
+          @if (checkedItems().length > 0) {
+            <div>
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-medium text-muted-foreground">Done</span>
+                <div class="flex-1 h-px bg-border"></div>
+                <span class="text-xs text-muted-foreground">{{ checkedItems().length }}</span>
+              </div>
+              <ul class="flex flex-col gap-1">
+                @for (item of checkedItems(); track item.id) {
+                  <li class="group flex items-center gap-3 p-3 rounded-lg bg-muted/30 border border-border/60">
+                    <button
+                      class="size-4 flex-shrink-0 rounded border-2 border-primary bg-primary flex items-center justify-center cursor-pointer transition-colors hover:opacity-80"
+                      (click)="toggleItem(item)"
+                      aria-label="Mark as not done">
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                      </svg>
+                    </button>
+                    <div class="flex-1 flex items-center gap-2 min-w-0 opacity-50">
+                      <span class="text-sm text-muted-foreground line-through truncate">{{ item.name }}</span>
+                      @if (item.quantity) {
+                        <span class="text-xs text-muted-foreground px-1.5 py-0.5 rounded font-medium flex-shrink-0 line-through">{{ item.quantity }}</span>
+                      }
                     </div>
-                    <button class="w-8 h-8 flex-shrink-0 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors cursor-pointer border-none bg-transparent" (click)="deleteItem(item.id)" aria-label="Delete item">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    <button
+                      class="size-7 flex items-center justify-center text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors cursor-pointer border-none bg-transparent opacity-0 group-hover:opacity-100"
+                      (click)="deleteItem(item.id)"
+                      aria-label="Delete item">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                      </svg>
                     </button>
                   </li>
                 }
               </ul>
             </div>
           }
+
         </div>
       }
     </main>
 
+    <!-- Nickname Modal -->
     @if (showNicknamePrompt()) {
-      <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm nickname-overlay">
-        <div class="bg-card border border-border w-full max-w-sm rounded-2xl p-6 shadow-lg flex flex-col">
-          <h2 class="text-xl font-bold text-foreground mb-2">What should we call you?</h2>
-          <p class="text-sm text-muted-foreground mb-6 leading-relaxed">This helps others see who added or checked off items.</p>
-          <div class="flex flex-col gap-4">
-            <input type="text" class="w-full bg-background border border-border text-foreground text-base px-4 py-3 rounded-xl outline-none focus:border-primary transition-colors placeholder:text-muted-foreground" placeholder="Your name" [ngModel]="nicknameInput()" (ngModelChange)="nicknameInput.set($event)" (keyup.enter)="saveNickname()" />
-            <div class="flex gap-3">
-              <button class="flex-1 bg-muted/50 text-foreground border border-border py-3 rounded-xl font-semibold cursor-pointer hover:bg-muted transition-colors" (click)="skipNickname()">Skip</button>
-              <button class="flex-1 bg-primary text-primary-foreground border-none py-3 rounded-xl font-semibold cursor-pointer hover:-translate-y-px shadow-sm transition-transform disabled:opacity-50" (click)="saveNickname()" [disabled]="!nicknameInput().trim()">Save</button>
+      <div class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm">
+        <div class="bg-card w-full sm:max-w-sm rounded-t-2xl sm:rounded-xl border border-border shadow-xl flex flex-col">
+          <div class="flex items-center justify-between p-5 pb-0">
+            <div>
+              <h2 class="text-base font-semibold text-foreground tracking-tight">What should we call you?</h2>
+              <p class="text-xs text-muted-foreground mt-0.5">Helps others see who added or checked items.</p>
             </div>
-            <div class="text-center mt-2">
-              <button class="text-sm text-muted-foreground hover:text-primary transition-colors bg-transparent border-none cursor-pointer underline" (click)="showAuthModal.set(true)">
-                Already have an account? Log in
-              </button>
+          </div>
+          <div class="h-px bg-border mx-5 mt-4"></div>
+          <div class="flex flex-col gap-4 p-5">
+            <input
+              hlmInput
+              type="text"
+              placeholder="Your name"
+              [ngModel]="nicknameInput()"
+              (ngModelChange)="nicknameInput.set($event)"
+              (keyup.enter)="saveNickname()"
+              class="h-9 text-sm"
+            />
+            <div class="flex gap-2">
+              <button hlmBtn variant="outline" class="flex-1 h-9 text-sm" (click)="skipNickname()">Skip</button>
+              <button hlmBtn class="flex-1 h-9 text-sm" (click)="saveNickname()" [disabled]="!nicknameInput().trim()">Save</button>
             </div>
+            <button
+              class="text-xs text-center text-muted-foreground hover:text-primary transition-colors bg-transparent border-none cursor-pointer underline underline-offset-4"
+              (click)="showAuthModal.set(true)">
+              Already have an account? Sign in
+            </button>
           </div>
         </div>
       </div>
     }
 
+    <!-- Auth Modal -->
     @if (showAuthModal()) {
-      <app-auth-modal (closeModal)="showAuthModal.set(false)"></app-auth-modal>
+      <app-auth-modal (close)="showAuthModal.set(false)"></app-auth-modal>
     }
+
   }
 </div>

@@ -6,11 +6,15 @@ import { CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk/drag-drop';
 import { SupabaseService, GroceryList, GroceryItem } from '../services/supabase.service';
 import { ListRegistryService } from '../services/list-registry.service';
 import { AuthModalComponent } from '../auth/auth.component';
+import { HlmButtonImports } from '../ui/button/src';
+import { HlmInputImports } from '../ui/input/src';
+import { HlmSpinnerImports } from '../ui/spinner/src';
+import { ThemeToggleComponent } from '../ui/theme-toggle.component';
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, CdkDropList, CdkDrag, AuthModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, CdkDropList, CdkDrag, AuthModalComponent, ThemeToggleComponent, ...HlmButtonImports, ...HlmInputImports, ...HlmSpinnerImports],
   templateUrl: './list.component.html',
 })
 export class ListComponent implements OnInit, OnDestroy {
