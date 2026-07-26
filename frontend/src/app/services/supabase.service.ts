@@ -40,7 +40,13 @@ export class SupabaseService {
     });
 
     this.client.auth.onAuthStateChange((_event, session) => {
-      this.currentUser.set(session?.user ?? null);
+      const newUser = session?.user ?? null;
+      const current = this.currentUser();
+      // Only update signal if user actually changed — prevents re-triggering
+      // effects on tab focus (Supabase re-validates session on visibility change)
+      if (newUser?.id !== current?.id) {
+        this.currentUser.set(newUser);
+      }
     });
   }
 
@@ -140,6 +146,11 @@ export class SupabaseService {
 
     localStorage.setItem(`creator_token_${shareToken}`, creatorToken);
 
+    // Also save to user_saved_lists so getUserLists picks it up immediately
+    if (user) {
+      this.saveListToAccount(data.id);
+    }
+
     return { shareToken, creatorToken, list: data as GroceryList };
   }
 
@@ -167,37 +178,19 @@ export class SupabaseService {
     const user = this.currentUser();
     if (!user) return [];
 
-    // Fetch lists created by the user
-    const { data: createdLists, error: err1 } = await this.client
-      .from('lists')
-      .select('*')
-      .eq('user_id', user.id);
-
-    if (err1) throw err1;
-
-    // Fetch lists saved by the user
-    const { data: savedData, error: err2 } = await this.client
+    const { data, error } = await this.client
       .from('user_saved_lists')
       .select('lists(*)')
       .eq('user_id', user.id);
 
-    if (err2) throw err2;
+    if (error) throw error;
 
-    const savedLists = (savedData || [])
-      .map(row => row.lists);
-
-    // Merge and deduplicate
-    const allListsMap = new Map<string, GroceryList>();
-    
-    [...(createdLists || []), ...savedLists].forEach((list: any) => {
-      // Supabase nested select returns single object for many-to-one
-      const listObj = Array.isArray(list) ? list[0] : list;
-      if (listObj && listObj.id) {
-        allListsMap.set(listObj.id, listObj as GroceryList);
-      }
-    });
-
-    return Array.from(allListsMap.values())
+    return (data || [])
+      .map((row: any) => {
+        const list = Array.isArray(row.lists) ? row.lists[0] : row.lists;
+        return list as GroceryList;
+      })
+      .filter((list): list is GroceryList => !!list?.id)
       .sort((a, b) => b.updated_at - a.updated_at);
   }
 
@@ -207,15 +200,13 @@ export class SupabaseService {
 
     const { error } = await this.client
       .from('user_saved_lists')
-      .insert({
-        user_id: user.id,
-        list_id: listId,
-        joined_at: Date.now()
-      });
-      
-    // Ignore duplicate key errors (23505 = unique_violation)
-    if (error && error.code !== '23505') {
-       console.error('Failed to save list to account:', error);
+      .upsert(
+        { user_id: user.id, list_id: listId, joined_at: Date.now() },
+        { onConflict: 'user_id,list_id' }
+      );
+
+    if (error) {
+      console.error('Failed to save list to account:', error);
     }
   }
 

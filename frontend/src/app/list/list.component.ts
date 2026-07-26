@@ -3,7 +3,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDropList, CdkDrag, moveItemInArray } from '@angular/cdk/drag-drop';
-import { SupabaseService, GroceryList, GroceryItem } from '../services/supabase.service';
+import { SupabaseService, GroceryItem } from '../services/supabase.service';
+import { StoreService } from '../services/store.service';
 import { ListRegistryService } from '../services/list-registry.service';
 import { AuthModalComponent } from '../auth/auth.component';
 import { HlmButtonImports } from '../ui/button/src';
@@ -21,13 +22,16 @@ export class ListComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private supabaseService = inject(SupabaseService);
+  public store = inject(StoreService);
   private listRegistryService = inject(ListRegistryService);
 
-  loading = signal<boolean>(true);
-  errorMessage = signal<string | null>(null);
-  
-  listData = signal<GroceryList | null>(null);
-  items = signal<GroceryItem[]>([]);
+  // Delegate to store
+  loading = this.store.listLoading;
+  errorMessage = this.store.listError;
+  listData = this.store.currentList;
+  items = this.store.currentItems;
+  activeItems = this.store.activeItems;
+  checkedItems = this.store.checkedItems;
 
   // Local user state
   userNickname = signal<string>('');
@@ -48,25 +52,11 @@ export class ListComponent implements OnInit, OnDestroy {
 
   showAuthModal = signal<boolean>(false);
 
-  private unsubscribeRealtime: (() => void) | null = null;
-
   isCreator = computed(() => {
     const list = this.listData();
     if (!list) return false;
     const creatorToken = localStorage.getItem(`creator_token_${list.share_token}`);
     return !!creatorToken;
-  });
-
-  activeItems = computed(() => {
-    return this.items()
-      .filter((i) => !i.checked)
-      .sort((a, b) => a.position - b.position);
-  });
-
-  checkedItems = computed(() => {
-    return this.items()
-      .filter((i) => i.checked)
-      .sort((a, b) => b.updated_at - a.updated_at);
   });
 
   constructor() {
@@ -86,80 +76,31 @@ export class ListComponent implements OnInit, OnDestroy {
       }
     }, { allowSignalWrites: true });
 
-    // Save list to account if logged in
+    // Save list to account once when both user and list are available
+    const savedListIds = new Set<string>();
     effect(() => {
       const user = this.supabaseService.currentUser();
       const list = this.listData();
-      if (user && list) {
+      if (user && list && !savedListIds.has(list.id)) {
+        savedListIds.add(list.id);
         this.supabaseService.saveListToAccount(list.id);
       }
     });
   }
 
   ngOnInit(): void {
-
     this.route.paramMap.subscribe((params) => {
       const shareToken = params.get('shareToken');
       if (shareToken) {
-        this.fetchListDetails(shareToken);
+        this.store.loadList(shareToken);
       } else {
-        this.loading.set(false);
-        this.errorMessage.set('No share token provided.');
+        this.store.listError.set('No share token provided.');
       }
     });
   }
 
   ngOnDestroy(): void {
-    if (this.unsubscribeRealtime) {
-      this.unsubscribeRealtime();
-    }
-  }
-
-  async fetchListDetails(token: string): Promise<void> {
-    this.loading.set(true);
-    this.errorMessage.set(null);
-
-    try {
-      const list = await this.supabaseService.getListByShareToken(token);
-      if (!list) {
-        this.loading.set(false);
-        this.errorMessage.set('This list does not exist or has been deleted.');
-        return;
-      }
-
-      this.listData.set(list);
-      this.editNameInput.set(list.name);
-      this.listRegistryService.addList({
-        shareToken: list.share_token,
-        name: list.name,
-        isCreator: this.isCreator(),
-        joinedAt: Date.now(),
-        lastAccessedAt: Date.now()
-      });
-      
-      await this.loadItems(list.id);
-
-      // Subscribe to real-time changes on Supabase
-      if (this.unsubscribeRealtime) this.unsubscribeRealtime();
-      this.unsubscribeRealtime = this.supabaseService.subscribeToItems(list.id, () => {
-        this.loadItems(list.id);
-      });
-
-    } catch (err) {
-      console.error('Failed to fetch list details:', err);
-      this.errorMessage.set('Failed to connect to cloud database.');
-    } finally {
-      this.loading.set(false);
-    }
-  }
-
-  async loadItems(listId: string): Promise<void> {
-    try {
-      const fetchedItems = await this.supabaseService.getItems(listId);
-      this.items.set(fetchedItems);
-    } catch (err) {
-      console.error('Failed to load items:', err);
-    }
+    this.store.clearCurrentList();
   }
 
   saveNickname(): void {
@@ -195,7 +136,7 @@ export class ListComponent implements OnInit, OnDestroy {
 
     try {
       await this.supabaseService.updateListName(list.share_token, newName, creatorToken);
-      this.listData.update(l => l ? { ...l, name: newName } : null);
+      this.store.currentList.update(l => l ? { ...l, name: newName } : null);
       this.listRegistryService.updateListName(list.share_token, newName);
     } catch (err) {
       console.error('Failed to update list name:', err);
@@ -258,49 +199,26 @@ export class ListComponent implements OnInit, OnDestroy {
     this.newItemName.set('');
     this.newItemQuantity.set('');
 
-    try {
-      await this.supabaseService.addItem(newItem);
-      await this.loadItems(list.id);
-    } catch (err) {
-      console.error('Failed to add item:', err);
-    }
+    await this.store.addItem(newItem);
   }
 
   async toggleItem(item: GroceryItem): Promise<void> {
     const list = this.listData();
     if (!list) return;
 
-    const updatedChecked = !item.checked;
-    
-    // Optimistic UI update
-    this.items.update(arr => arr.map(i => i.id === item.id ? { ...i, checked: updatedChecked, editor: this.userNickname() || 'Someone' } : i));
-
-    try {
-      await this.supabaseService.updateItem({
-        id: item.id,
-        list_id: list.id,
-        checked: updatedChecked,
-        editor: this.userNickname() || 'Someone'
-      });
-    } catch (err) {
-      console.error('Failed to toggle item:', err);
-      await this.loadItems(list.id);
-    }
+    await this.store.updateItem({
+      id: item.id,
+      list_id: list.id,
+      checked: !item.checked,
+      editor: this.userNickname() || 'Someone'
+    });
   }
 
   async deleteItem(itemId: string): Promise<void> {
     const list = this.listData();
     if (!list) return;
 
-    // Optimistic UI update
-    this.items.update(arr => arr.filter(i => i.id !== itemId));
-
-    try {
-      await this.supabaseService.deleteItem(itemId, list.id);
-    } catch (err) {
-      console.error('Failed to delete item:', err);
-      await this.loadItems(list.id);
-    }
+    await this.store.deleteItem(itemId, list.id);
   }
 
   async drop(event: any): Promise<void> {
@@ -324,17 +242,11 @@ export class ListComponent implements OnInit, OnDestroy {
     const list = this.listData();
     if (!list) return;
 
-    try {
-      await this.supabaseService.updateItem({
-        id: movedItem.id,
-        list_id: list.id,
-        position: newPosition,
-        editor: this.userNickname() || 'Someone'
-      });
-      await this.loadItems(list.id);
-    } catch (err) {
-      console.error('Failed to update item position:', err);
-      await this.loadItems(list.id);
-    }
+    await this.store.updateItem({
+      id: movedItem.id,
+      list_id: list.id,
+      position: newPosition,
+      editor: this.userNickname() || 'Someone'
+    });
   }
 }

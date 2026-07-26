@@ -1,8 +1,9 @@
-import { Component, inject, OnInit, signal, effect } from '@angular/core';
+import { Component, inject, signal, effect } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService, GroceryList } from '../services/supabase.service';
+import { SupabaseService } from '../services/supabase.service';
+import { StoreService } from '../services/store.service';
 import { AuthModalComponent } from '../auth/auth.component';
 import { ListRegistryService, ListRegistryEntry } from '../services/list-registry.service';
 import { HlmButtonImports } from '../ui/button/src';
@@ -26,12 +27,12 @@ import { ThemeToggleComponent } from '../ui/theme-toggle.component';
   ],
   templateUrl: './landing.component.html',
 })
-export class LandingComponent implements OnInit {
+export class LandingComponent {
   private router = inject(Router);
   public supabaseService = inject(SupabaseService);
+  public store = inject(StoreService);
   private listRegistryService = inject(ListRegistryService);
 
-  lists = signal<GroceryList[]>([]);
   localLists = signal<ListRegistryEntry[]>([]);
 
   showCreatePrompt = signal<boolean>(false);
@@ -40,32 +41,15 @@ export class LandingComponent implements OnInit {
   loading = signal<boolean>(false);
 
   constructor() {
-    // Re-fetch lists whenever auth state changes
+    // Single effect handles all auth state changes — no ngOnInit duplication
     effect(() => {
       const user = this.supabaseService.currentUser();
       if (user) {
-        this.loadUserLists();
+        this.store.loadUserLists();
       } else {
         this.localLists.set(this.listRegistryService.getLists());
       }
     });
-  }
-
-  ngOnInit(): void {
-    if (this.supabaseService.currentUser()) {
-      this.loadUserLists();
-    } else {
-      this.localLists.set(this.listRegistryService.getLists());
-    }
-  }
-
-  async loadUserLists(): Promise<void> {
-    try {
-      const listsData = await this.supabaseService.getUserLists();
-      this.lists.set(listsData);
-    } catch (err) {
-      console.error('Failed to load user lists:', err);
-    }
   }
 
   onCreateList(): void {
@@ -96,7 +80,7 @@ export class LandingComponent implements OnInit {
 
   async onLogout(): Promise<void> {
     await this.supabaseService.signOut();
-    this.lists.set([]);
+    this.store.clearUserLists();
     this.localLists.set(this.listRegistryService.getLists());
   }
 }
