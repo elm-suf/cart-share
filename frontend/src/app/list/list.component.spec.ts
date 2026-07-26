@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { ListComponent } from './list.component';
 import { ListRegistryService } from '../services/list-registry.service';
-import { WebsocketService } from '../services/websocket.service';
 import { ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 
@@ -40,7 +39,6 @@ describe('ListComponent', () => {
       providers: [
         provideZonelessChangeDetection(),
         { provide: ListRegistryService, useValue: mockListRegistryService },
-        { provide: WebsocketService, useValue: mockWebsocketService },
         { provide: ActivatedRoute, useValue: mockRoute }
       ]
     })

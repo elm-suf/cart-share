@@ -7,17 +7,4 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-    depends_on:
-      - backend
     restart: always
-
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    volumes:
-      - sqlite_data:/app/data
-    restart: always
-
-volumes:
-  sqlite_data:

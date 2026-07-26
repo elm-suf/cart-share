@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://cart-share-backend.onrender.com/api',
-  wsUrl: 'wss://cart-share-backend.onrender.com/ws'
+  supabaseUrl: 'https://yatjwayegnihlvelaonp.supabase.co',
+  supabaseKey: 'sb_publishable_mcC_ansVcCwYK5KDPMYONw_lyKq9jrG'
 };
