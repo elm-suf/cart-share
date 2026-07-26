@@ -6,10 +6,15 @@ import { SupabaseService, GroceryList } from '../services/supabase.service';
 import { AuthModalComponent } from '../auth/auth.component';
 import { ListRegistryService, ListRegistryEntry } from '../services/list-registry.service';
 
+import { HlmButton } from '@spartan-ng/helm/button';
+import { HlmInput } from '@spartan-ng/helm/input';
+import { HlmCardImports } from '@spartan-ng/helm/card';
+import { HlmDialogImports } from '@spartan-ng/helm/dialog';
+
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [CommonModule, FormsModule, AuthModalComponent],
+  imports: [CommonModule, FormsModule, AuthModalComponent, HlmButton, HlmInput, ...HlmCardImports, ...HlmDialogImports],
   templateUrl: './landing.component.html',
 })
 export class LandingComponent implements OnInit {

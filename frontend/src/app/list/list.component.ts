@@ -7,10 +7,16 @@ import { SupabaseService, GroceryList, GroceryItem } from '../services/supabase.
 import { ListRegistryService } from '../services/list-registry.service';
 import { AuthModalComponent } from '../auth/auth.component';
 
+import { HlmButton } from '@spartan-ng/helm/button';
+import { HlmInput } from '@spartan-ng/helm/input';
+import { HlmCardImports } from '@spartan-ng/helm/card';
+import { HlmDialogImports } from '@spartan-ng/helm/dialog';
+import { HlmCheckboxImports } from '@spartan-ng/helm/checkbox';
+
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, CdkDropList, CdkDrag, AuthModalComponent],
+  imports: [CommonModule, FormsModule, RouterModule, CdkDropList, CdkDrag, AuthModalComponent, HlmButton, HlmInput, ...HlmCardImports, ...HlmDialogImports, ...HlmCheckboxImports],
   templateUrl: './list.component.html',
 })
 export class ListComponent implements OnInit, OnDestroy {
