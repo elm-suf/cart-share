@@ -25,6 +25,12 @@
       "skillPath": "skills/spartan/SKILL.md",
       "computedHash": "126d1eba31bef1c33c37ce3675bc20d0e74a5c2f42625d7837d5c8fae25234e5"
     },
+    "supabase-server": {
+      "source": "supabase/server",
+      "sourceType": "github",
+      "skillPath": "skills/supabase-server/SKILL.md",
+      "computedHash": "b430ad2b08734bba89f2168c201bc7e090729d38a0206eebba338a7a5c1de3d6"
+    },
     "tdd": {
       "source": "mattpocock/skills",
       "sourceType": "github",
